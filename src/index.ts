@@ -12,10 +12,10 @@ app.get('/',(req,res)=>{
     res.send('Hello');
 });
 
-app.listen(PORT,()=>{
-    console.log(`Server is running on port : ${PORT}`);
-})
-
 AppDataSource.initialize()
   .then(() => console.log('Database connected'))
   .catch((err) => console.error('Error during initialization', err));
+
+app.listen(PORT,()=>{
+    console.log(`Server is running on port : ${PORT}`);
+});
