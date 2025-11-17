@@ -1,0 +1,31 @@
+{
+  "name": "fintalks",
+  "version": "1.0.0",
+  "description": "FinTalks is a financial blog platform for finance enthusiasts to share experiences, predictions, and investment insights.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --watch './**/*.ts' --exec ts-node src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redowansami/FinTalks.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/redowansami/FinTalks/issues"
+  },
+  "homepage": "https://github.com/redowansami/FinTalks#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5"
+  }
+}
