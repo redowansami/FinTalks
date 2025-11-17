@@ -1,0 +1,46 @@
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    CreateDateColumn,
+    OneToOne,
+	Unique,
+} from 'typeorm';
+import { Auth } from './authEntity';
+
+export enum UserRole {
+	ADMIN = 'ADMIN',
+	USER = 'USER',
+}
+
+@Entity({ name: 'users' })
+@Unique(['username', 'email'])
+export class User {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column({ unique: true })
+    username: string;
+
+    @Column()
+    name: string;
+
+    @Column({ unique: true })
+    email: string;
+
+    @CreateDateColumn({ type: 'timestamp' })
+    joinDate: Date;
+
+    @Column({
+      type: 'enum',
+      enum: UserRole,
+      default: UserRole.USER,
+    })
+    role: UserRole;
+
+    @Column({ type: 'timestamp', nullable: true })
+    passwordLastModificationTime: Date;
+
+    @OneToOne(() => Auth, (auth) => auth.user)
+    auth: Auth;
+}
