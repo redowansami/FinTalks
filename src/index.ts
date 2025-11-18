@@ -1,21 +1,21 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import { AppDataSource } from './config/dataSource';
+import userRoutes from './routes/userRoutes';
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
-app.get('/',(req,res)=>{
-    res.send('Hello');
-});
+app.use("/api/users", userRoutes);
 
 AppDataSource.initialize()
-  .then(() => console.log('Database connected'))
-  .catch((err) => console.error('Error during initialization', err));
-
-app.listen(PORT,()=>{
-    console.log(`Server is running on port : ${PORT}`);
-});
+    .then(() => {
+        console.log('Database connected');
+        app.listen(PORT,()=>{
+        console.log(`Server is running on port : ${PORT}`);
+        });
+    })
+    .catch((err) => console.error('Error during initialization', err));
