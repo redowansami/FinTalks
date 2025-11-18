@@ -11,19 +11,19 @@ export class UserRepository {
 
     async create(data: Partial<User>): Promise<User> {
         const user = this.repository.create(data);
-        return await this.repository.save(user);
+        return this.repository.save(user);
     }
 
     async findAll(): Promise<User[]> {
-        return await this.repository.find();
+        return this.repository.find();
     }
 
     async findById(id: number): Promise<User | null> {
-        return await this.repository.findOne({ where: { id } });
+        return this.repository.findOne({ where: { id } });
     }
 
     async update(user: User): Promise<User> {
-        return await this.repository.save(user);
+        return this.repository.save(user);
     }
 
     async softDelete(id: number): Promise<boolean> {

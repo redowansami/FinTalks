@@ -5,15 +5,15 @@ export class UserService {
     constructor(private readonly userRepository: UserRepository) {}
 
     async createUser(data: Partial<User>): Promise<User> {
-        return await this.userRepository.create(data);
+        return this.userRepository.create(data);
     }
 
     async getAllUsers(): Promise<User[]> {
-        return await this.userRepository.findAll();
+        return this.userRepository.findAll();
     }
 
     async getUserById(id: number): Promise<User | null> {
-        return await this.userRepository.findById(id);
+        return this.userRepository.findById(id);
     }
 
     async updateUser(id: number, updatedData: Partial<User>): Promise<User | null> {
@@ -21,10 +21,10 @@ export class UserService {
         if (!existingUser) return null;
 
         Object.assign(existingUser, updatedData);
-        return await this.userRepository.update(existingUser);
+        return this.userRepository.update(existingUser);
     }
 
     async deleteUser(id: number): Promise<boolean> {
-        return await this.userRepository.softDelete(id);
+        return this.userRepository.softDelete(id);
     }
 }
