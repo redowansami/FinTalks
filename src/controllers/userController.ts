@@ -36,7 +36,7 @@ export class UserController {
     }
     }
 
-    static async update(req: Request, res: Response) {
+    static async patchUpdate(req: Request, res: Response) {
         try {
             const id = Number(req.params.userId);
             const updated = await userService.updateUser(id, req.body);
@@ -47,6 +47,30 @@ export class UserController {
         }
     }
 
+    static async putUpdate(req: Request, res: Response) {
+    try {
+        const id = Number(req.params.userId);
+        const existingUser = await userService.getUserById(id);
+
+        if (!existingUser) {
+            const createdUser = await userService.createUser({ id, ...req.body });
+            return res.status(201).json({
+                message: "User created",
+                user: createdUser
+            });
+        }
+
+        const updatedUser = await userService.updateUser(id, req.body);
+
+        return res.json({
+            message: "User updated",
+            user: updatedUser
+        });
+
+    } catch (err) {
+        res.status(500).json({ message: "Failed to update or create user", error: err });
+    }
+}
 
     static async delete(req: Request, res: Response) {
     try {
