@@ -17,11 +17,23 @@ export class UserService {
     }
 
     async updateUser(id: number, updatedData: Partial<User>): Promise<User | null> {
-        const existingUser = await this.userRepository.findById(id);
-        if (!existingUser) return null;
+        const existing = await this.userRepository.findById(id);
+        if (!existing) return null;
 
-        Object.assign(existingUser, updatedData);
-        return this.userRepository.update(existingUser);
+        const merged = Object.assign(existing, updatedData);
+        return this.userRepository.update(merged);
+    }
+
+    async upsertUser(id: number, data: Partial<User>): Promise<{ created: boolean; user: User }> {
+        const existing = await this.userRepository.findById(id);
+
+        if (!existing) {
+            const createdUser = await this.userRepository.create({ id, ...data });
+            return { created: true, user: createdUser };
+        }
+
+        const updated = await this.updateUser(id, data);
+        return { created: false, user: updated! };
     }
 
     async deleteUser(id: number): Promise<boolean> {
