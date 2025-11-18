@@ -5,8 +5,8 @@ import {
     CreateDateColumn,
     OneToOne,
 	Unique,
+  DeleteDateColumn,
 } from 'typeorm';
-import { Auth } from './authEntity';
 
 export enum UserRole {
 	ADMIN = 'ADMIN',
@@ -32,15 +32,15 @@ export class User {
     joinDate: Date;
 
     @Column({
-      type: 'enum',
-      enum: UserRole,
-      default: UserRole.USER,
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
     })
     role: UserRole;
 
     @Column({ type: 'timestamp', nullable: true })
     passwordLastModificationTime: Date;
 
-    @OneToOne(() => Auth, (auth) => auth.user)
-    auth: Auth;
+    @DeleteDateColumn({ type: "timestamp", nullable: true })
+    deletedAt: Date|null;
 }
