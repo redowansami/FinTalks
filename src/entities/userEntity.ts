@@ -1,11 +1,10 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    OneToOne,
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	CreateDateColumn,
 	Unique,
-  DeleteDateColumn,
+	DeleteDateColumn,
 } from 'typeorm';
 
 export enum UserRole {
@@ -16,31 +15,31 @@ export enum UserRole {
 @Entity({ name: 'users' })
 @Unique(['username', 'email'])
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+	@PrimaryGeneratedColumn()
+	id: number;
 
-    @Column({ unique: true })
-    username: string;
+	@Column({ unique: true })
+	username: string;
 
-    @Column()
-    name: string;
+	@Column()
+	name: string;
 
-    @Column({ unique: true })
-    email: string;
+	@Column({ unique: true })
+	email: string;
 
-    @CreateDateColumn({ type: 'timestamp' })
-    joinDate: Date;
+	@CreateDateColumn({ type: 'timestamp' })
+	joinDate: Date;
 
-    @Column({
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.USER,
-    })
-    role: UserRole;
+	@Column({
+		type: 'enum',
+		enum: UserRole,
+		default: UserRole.USER,
+	})
+	role: UserRole;
 
-    @Column({ type: 'timestamp', nullable: true })
-    passwordLastModificationTime: Date;
+	@Column({ type: 'timestamp', nullable: true })
+	passwordLastModificationTime: Date;
 
-    @DeleteDateColumn({ type: "timestamp", nullable: true })
-    deletedAt: Date|null;
+	@DeleteDateColumn({ type: 'timestamp', nullable: true })
+	deletedAt: Date | null;
 }
