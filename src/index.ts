@@ -9,13 +9,13 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/api/users", userRoutes);
+app.use('/api/users', userRoutes);
 
 AppDataSource.initialize()
-    .then(() => {
-        console.log('Database connected');
-        app.listen(PORT,()=>{
-        console.log(`Server is running on port : ${PORT}`);
-        });
-    })
-    .catch((err) => console.error('Error during initialization', err));
+	.then(() => {
+		console.log('Database connected');
+		app.listen(PORT, () => {
+			console.log(`Server is running on port : ${PORT}`);
+		});
+	})
+	.catch((err) => console.error('Error during initialization', err));
