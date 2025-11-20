@@ -1,14 +1,16 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { UserNotFoundException } from '../exceptions/UserNotFoundException';
+import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '../dtos/userDTO';
 
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	async create(req: Request, res: Response): Promise<Response> {
 		try {
-			await this.userService.createUser(req.body);
-			return res.status(201).json({ message: 'User created' });
+			const createUser: CreateUserDTO = req.body;
+			const result: UserResponseDTO = await this.userService.createUser(createUser);
+			return res.status(201).json({ message: 'User created', user: result });
 		} catch (err) {
 			return res.status(400).json({ message: 'Failed to create user', err });
 		}
@@ -16,7 +18,7 @@ export class UserController {
 
 	async findAll(req: Request, res: Response): Promise<Response> {
 		try {
-			const users = await this.userService.getAllUsers();
+			const users: UserResponseDTO[] = await this.userService.getAllUsers();
 			return res.json(users);
 		} catch {
 			return res.status(400).json({ message: 'Failed to get users' });
@@ -26,7 +28,7 @@ export class UserController {
 	async findOne(req: Request, res: Response): Promise<Response> {
 		try {
 			const id = req.params.userId;
-			const user = await this.userService.getUserById(id);
+			const user: UserResponseDTO = await this.userService.getUserById(id);
 
 			return res.json(user);
 		} catch (err) {
@@ -40,7 +42,8 @@ export class UserController {
 	async patchUpdate(req: Request, res: Response): Promise<Response> {
 		try {
 			const id = req.params.userId;
-			const result = await this.userService.updateUser(id, req.body);
+			const updateUser: UpdateUserDTO = req.body;
+			const result: UserResponseDTO = await this.userService.updateUser(id, updateUser);
 
 			return res.json(result);
 		} catch (err) {
