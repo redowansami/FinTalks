@@ -3,25 +3,18 @@ import { User } from './userEntity';
 
 @Entity()
 export class Auth {
-	@PrimaryGeneratedColumn()
-	id: number;
-
-	@Column()
-	username: string;
-
-	@Column()
-	email: string;
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
 	@Column()
 	password: string;
 
+	@Column({ type: 'timestamp', nullable: true })
+	passwordLastModificationTime: Date;
+
 	@OneToOne(() => User, {
 		onDelete: 'CASCADE',
-		onUpdate: 'CASCADE',
 	})
-	@JoinColumn([
-		{ name: 'username', referencedColumnName: 'username' },
-		{ name: 'email', referencedColumnName: 'email' },
-	])
+	@JoinColumn({ name: 'userId', referencedColumnName: 'id' })
 	user: User;
 }
