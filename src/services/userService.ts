@@ -1,5 +1,6 @@
 import { User } from '../entities/userEntity';
 import { UserRepository } from '../repositories/userRepository';
+import { UserNotFoundException } from '../exceptions/UserNotFoundException';
 
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
@@ -12,31 +13,22 @@ export class UserService {
 		return this.userRepository.findAll();
 	}
 
-	async getUserById(id: number): Promise<User | null> {
-		return this.userRepository.findById(id);
+	async getUserById(id: string): Promise<User> {
+		const user = await this.userRepository.findById(id);
+		if (!user) {
+			throw new UserNotFoundException();
+		}
+		return user;
 	}
 
-	async updateUser(id: number, updatedData: Partial<User>): Promise<User | null> {
-		const existing = await this.userRepository.findById(id);
-		if (!existing) return null;
-
+	async updateUser(id: string, updatedData: Partial<User>): Promise<User> {
+		const existing = await this.getUserById(id);
 		const merged = Object.assign(existing, updatedData);
 		return this.userRepository.update(merged);
 	}
 
-	async upsertUser(id: number, data: Partial<User>): Promise<{ created: boolean; user: User }> {
-		const existing = await this.userRepository.findById(id);
-
-		if (!existing) {
-			const createdUser = await this.userRepository.create({ id, ...data });
-			return { created: true, user: createdUser };
-		}
-
-		const updated = await this.updateUser(id, data);
-		return { created: false, user: updated! };
-	}
-
-	async deleteUser(id: number): Promise<boolean> {
-		return this.userRepository.softDelete(id);
+	async deleteUser(id: string): Promise<void> {
+		await this.getUserById(id);
+		await this.userRepository.softDelete(id);
 	}
 }

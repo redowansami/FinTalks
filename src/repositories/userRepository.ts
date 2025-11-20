@@ -18,7 +18,7 @@ export class UserRepository {
 		return this.repository.find();
 	}
 
-	async findById(id: number): Promise<User | null> {
+	async findById(id: string): Promise<User | null> {
 		return this.repository.findOne({ where: { id } });
 	}
 
@@ -26,7 +26,7 @@ export class UserRepository {
 		return this.repository.save(user);
 	}
 
-	async softDelete(id: number): Promise<boolean> {
+	async softDelete(id: string): Promise<boolean> {
 		const result = await this.repository.softDelete(id);
 		return result.affected === 1;
 	}
