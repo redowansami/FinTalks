@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { UserNotFoundException } from '../exceptions/UserNotFoundException';
 import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '../dtos/userDTO';
+import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
 
 export class UserController {
 	constructor(private readonly userService: UserService) {}
@@ -10,9 +11,13 @@ export class UserController {
 		try {
 			const createUser: CreateUserDTO = req.body;
 			const result: UserResponseDTO = await this.userService.createUser(createUser);
-			return res.status(201).json({ message: 'User created', user: result });
+			return res
+				.status(HTTP_STATUS.CREATED)
+				.json({ message: HTTP_MESSAGES.USER_CREATED, user: result });
 		} catch (err) {
-			return res.status(400).json({ message: 'Failed to create user', err });
+			return res
+				.status(HTTP_STATUS.BAD_REQUEST)
+				.json({ message: HTTP_MESSAGES.FAILED_CREATE_USER, err });
 		}
 	}
 
@@ -21,7 +26,9 @@ export class UserController {
 			const users: UserResponseDTO[] = await this.userService.getAllUsers();
 			return res.json(users);
 		} catch {
-			return res.status(400).json({ message: 'Failed to get users' });
+			return res
+				.status(HTTP_STATUS.BAD_REQUEST)
+				.json({ message: HTTP_MESSAGES.FAILED_GET_USERS });
 		}
 	}
 
@@ -33,9 +40,13 @@ export class UserController {
 			return res.json(user);
 		} catch (err) {
 			if (err instanceof UserNotFoundException) {
-				return res.status(err.status).json({ message: err.message });
+				return res
+					.status(HTTP_STATUS.NOT_FOUND)
+					.json({ message: HTTP_MESSAGES.USER_NOT_FOUND });
 			}
-			return res.status(400).json({ message: 'Failed to fetch user' });
+			return res
+				.status(HTTP_STATUS.BAD_REQUEST)
+				.json({ message: HTTP_MESSAGES.FAILED_FETCH_USER });
 		}
 	}
 
@@ -48,9 +59,13 @@ export class UserController {
 			return res.json(result);
 		} catch (err) {
 			if (err instanceof UserNotFoundException) {
-				return res.status(404).json({ message: 'User not found' });
+				return res
+					.status(HTTP_STATUS.NOT_FOUND)
+					.json({ message: HTTP_MESSAGES.USER_NOT_FOUND });
 			}
-			return res.status(400).json({ message: 'Failed to update user' });
+			return res
+				.status(HTTP_STATUS.BAD_REQUEST)
+				.json({ message: HTTP_MESSAGES.FAILED_UPDATE_USER });
 		}
 	}
 
@@ -58,12 +73,16 @@ export class UserController {
 		try {
 			const id = req.params.userId;
 			await this.userService.deleteUser(id);
-			return res.json({ message: 'User deleted' });
+			return res.json({ message: HTTP_MESSAGES.USER_DELETED });
 		} catch (err) {
 			if (err instanceof UserNotFoundException) {
-				return res.status(404).json({ message: 'User not found' });
+				return res
+					.status(HTTP_STATUS.NOT_FOUND)
+					.json({ message: HTTP_MESSAGES.USER_NOT_FOUND });
 			}
-			return res.status(400).json({ message: 'Failed to delete user' });
+			return res
+				.status(HTTP_STATUS.BAD_REQUEST)
+				.json({ message: HTTP_MESSAGES.FAILED_DELETE_USER });
 		}
 	}
 }
