@@ -7,28 +7,27 @@ export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
 
 	async createUser(data: CreateUserDTO): Promise<UserResponseDTO> {
-		const user = await this.userRepository.create(data);
+		const user: User = await this.userRepository.create(data);
 		return this.mapToResponseDTO(user);
 	}
 
 	async getAllUsers(): Promise<UserResponseDTO[]> {
-		const users = await this.userRepository.findAll();
-		return users.map((user) => this.mapToResponseDTO(user));
+		const users: UserResponseDTO[] = await this.userRepository.findAll();
+		return users;
 	}
 
 	async getUserById(id: string): Promise<UserResponseDTO> {
-		const user = await this.userRepository.findById(id);
+		const user: UserResponseDTO | null = await this.userRepository.findById(id);
 		if (!user) {
 			throw new UserNotFoundException();
 		}
-		return this.mapToResponseDTO(user);
+		return user;
 	}
 
 	async updateUser(id: string, updatedData: UpdateUserDTO): Promise<UserResponseDTO> {
-		const existing = await this.getUserById(id);
-		const merged = Object.assign(existing, updatedData);
-		const updated = await this.userRepository.update(merged as User);
-		return this.mapToResponseDTO(updated);
+		await this.getUserById(id);
+		const updated = await this.userRepository.update(id, updatedData as User);
+		return updated;
 	}
 
 	async deleteUser(id: string): Promise<void> {
@@ -38,7 +37,7 @@ export class UserService {
 
 	private mapToResponseDTO(user: User): UserResponseDTO {
 		return {
-			id: user.id,
+			userId: user.userId,
 			username: user.username,
 			name: user.name,
 			email: user.email,
