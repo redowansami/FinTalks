@@ -3,7 +3,6 @@ export const HTTP_STATUS = {
 	OK: 200,
 	BAD_REQUEST: 400,
 	NOT_FOUND: 404,
-	INTERNAL_SERVER_ERROR: 500,
 };
 
 export const HTTP_MESSAGES = {
@@ -15,4 +14,5 @@ export const HTTP_MESSAGES = {
 	FAILED_FETCH_USER: 'Failed to fetch user',
 	FAILED_UPDATE_USER: 'Failed to update user',
 	FAILED_DELETE_USER: 'Failed to delete user',
+	VALIDATION_FAILED: 'Validation failed',
 };

@@ -1,15 +1,16 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { UserService } from '../services/userService';
 import { UserNotFoundException } from '../exceptions/UserNotFoundException';
 import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '../dtos/userDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
+import { ValidatedRequest } from '../middleware/validationMiddleware';
 
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
-	async create(req: Request, res: Response): Promise<Response> {
+	async create(req: ValidatedRequest, res: Response): Promise<Response> {
 		try {
-			const createUser: CreateUserDTO = req.body;
+			const createUser: CreateUserDTO = req.validated?.body as CreateUserDTO;
 			const result: UserResponseDTO = await this.userService.createUser(createUser);
 			return res
 				.status(HTTP_STATUS.CREATED)
@@ -21,7 +22,7 @@ export class UserController {
 		}
 	}
 
-	async findAll(req: Request, res: Response): Promise<Response> {
+	async findAll(req: ValidatedRequest, res: Response): Promise<Response> {
 		try {
 			const users: UserResponseDTO[] = await this.userService.getAllUsers();
 			return res.json(users);
@@ -32,9 +33,9 @@ export class UserController {
 		}
 	}
 
-	async findOne(req: Request, res: Response): Promise<Response> {
+	async findOne(req: ValidatedRequest, res: Response): Promise<Response> {
 		try {
-			const id = req.params.userId;
+			const id = (req.validated?.params as Record<string, string>).userId;
 			const user: UserResponseDTO = await this.userService.getUserById(id);
 
 			return res.json(user);
@@ -50,10 +51,10 @@ export class UserController {
 		}
 	}
 
-	async patchUpdate(req: Request, res: Response): Promise<Response> {
+	async patchUpdate(req: ValidatedRequest, res: Response): Promise<Response> {
 		try {
-			const id = req.params.userId;
-			const updateUser: UpdateUserDTO = req.body;
+			const id = (req.validated?.params as Record<string, string>).userId;
+			const updateUser: UpdateUserDTO = req.validated?.body as UpdateUserDTO;
 			const result: UserResponseDTO = await this.userService.updateUser(id, updateUser);
 
 			return res.json(result);
@@ -69,9 +70,9 @@ export class UserController {
 		}
 	}
 
-	async delete(req: Request, res: Response): Promise<Response> {
+	async delete(req: ValidatedRequest, res: Response): Promise<Response> {
 		try {
-			const id = req.params.userId;
+			const id = (req.validated?.params as Record<string, string>).userId;
 			await this.userService.deleteUser(id);
 			return res.json({ message: HTTP_MESSAGES.USER_DELETED });
 		} catch (err) {
