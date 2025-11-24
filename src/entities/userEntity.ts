@@ -3,7 +3,6 @@ import {
 	PrimaryGeneratedColumn,
 	Column,
 	CreateDateColumn,
-	Unique,
 	DeleteDateColumn,
 } from 'typeorm';
 
@@ -13,10 +12,9 @@ export enum UserRole {
 }
 
 @Entity({ name: 'users' })
-@Unique(['username', 'email'])
 export class User {
-	@PrimaryGeneratedColumn()
-	id: number;
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
 	@Column({ unique: true })
 	username: string;
@@ -36,9 +34,6 @@ export class User {
 		default: UserRole.USER,
 	})
 	role: UserRole;
-
-	@Column({ type: 'timestamp', nullable: true })
-	passwordLastModificationTime: Date;
 
 	@DeleteDateColumn({ type: 'timestamp', nullable: true })
 	deletedAt: Date | null;

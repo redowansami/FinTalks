@@ -17,8 +17,6 @@ export default [
       prettier: prettierPlugin
     },
     rules: {
-      semi: ['error', 'always'],
-      quotes: ['error', 'single'],
 
       '@typescript-eslint/explicit-function-return-type': 'warn',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
