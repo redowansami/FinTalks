@@ -1,12 +1,13 @@
 import { Entity, Column, OneToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './userEntity';
+import { LENTGH_CONSTRAINTS } from '../constants/constants';
 
 @Entity()
 export class Auth {
 	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	authId: string;
 
-	@Column()
+	@Column({ length: LENTGH_CONSTRAINTS.PASSWORD_MAX })
 	password: string;
 
 	@Column({ type: 'timestamp', nullable: true })
@@ -15,6 +16,6 @@ export class Auth {
 	@OneToOne(() => User, {
 		onDelete: 'CASCADE',
 	})
-	@JoinColumn({ name: 'userId', referencedColumnName: 'id' })
+	@JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
 	user: User;
 }

@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { UserService } from '../services/userService';
 import { UserNotFoundException } from '../exceptions/UserNotFoundException';
 import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '../dtos/userDTO';
-import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
+import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/constants';
 import { ValidatedRequest } from '../middleware/validationMiddleware';
 
 export class UserController {
