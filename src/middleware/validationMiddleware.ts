@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodType, z } from 'zod';
-import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/constants';
+import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
 
 export interface ValidatedRequest extends Request {
 	validated?: {

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { UserRole } from '../entities/userEntity';
-import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/constants';
+import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validationConstants';
 
 export const createUserDTO = z
 	.object({

@@ -5,7 +5,7 @@ import {
 	CreateDateColumn,
 	DeleteDateColumn,
 } from 'typeorm';
-import { LENTGH_CONSTRAINTS } from '../constants/constants';
+import { LENTGH_CONSTRAINTS } from '../constants/validationConstants';
 
 export enum UserRole {
 	ADMIN = 'ADMIN',
