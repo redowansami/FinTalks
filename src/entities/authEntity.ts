@@ -7,7 +7,7 @@ export class Auth {
 	@PrimaryGeneratedColumn('uuid')
 	authId: string;
 
-	@Column({ length: LENTGH_CONSTRAINTS.PASSWORD_MAX })
+	@Column({ type: 'varchar', length: LENTGH_CONSTRAINTS.PASSWORD_MAX })
 	password: string;
 
 	@Column({ type: 'timestamp', nullable: true })

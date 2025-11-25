@@ -17,13 +17,13 @@ export class User {
 	@PrimaryGeneratedColumn('uuid')
 	userId: string;
 
-	@Column({ unique: true, length: LENTGH_CONSTRAINTS.USERNAME_MAX })
+	@Column({ type: 'varchar', unique: true, length: LENTGH_CONSTRAINTS.USERNAME_MAX })
 	username: string;
 
-	@Column({ length: LENTGH_CONSTRAINTS.NAME_MAX })
+	@Column({ type: 'varchar', length: LENTGH_CONSTRAINTS.NAME_MAX })
 	name: string;
 
-	@Column({ unique: true })
+	@Column({ type: 'varchar', unique: true })
 	email: string;
 
 	@CreateDateColumn({ type: 'timestamp' })
