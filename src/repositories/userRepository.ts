@@ -2,7 +2,6 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../config/dataSource';
 import { User } from '../entities/userEntity';
 import { CreateUserDTO } from 'dtos/userDTO';
-import { UpdateResult } from 'typeorm/browser';
 
 export class UserRepository {
 	private repository: Repository<User>;
@@ -12,7 +11,7 @@ export class UserRepository {
 	}
 
 	async create(data: CreateUserDTO): Promise<User> {
-		const user: User = this.repository.create(data);
+		const user = this.repository.create(data);
 		return this.repository.save(user);
 	}
 
@@ -25,12 +24,12 @@ export class UserRepository {
 	}
 
 	async update(id: string, user: Partial<User>): Promise<boolean> {
-		const result: UpdateResult = await this.repository.update(id, user);
+		const result = await this.repository.update(id, user);
 		return result.affected === 1;
 	}
 
 	async softDelete(id: string): Promise<boolean> {
-		const result: UpdateResult = await this.repository.softDelete(id);
+		const result = await this.repository.softDelete(id);
 		return result.affected === 1;
 	}
 }

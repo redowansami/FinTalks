@@ -1,17 +1,15 @@
 import { Response } from 'express';
 import { UserService } from '../services/userService';
-import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '../dtos/userDTO';
+import { CreateUserDTO, UpdateUserDTO } from '../dtos/userDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
 import { ValidatedRequest } from '../middleware/validationMiddleware';
 
 export class UserController {
-	constructor(private readonly userService: UserService) {
-		this.userService = userService;
-	}
+	constructor(private readonly userService: UserService) {}
 
 	async create(req: ValidatedRequest, res: Response): Promise<void> {
 		const createUser: CreateUserDTO = req.validated?.body as CreateUserDTO;
-		const result: UserResponseDTO = await this.userService.createUser(createUser);
+		const result = await this.userService.createUser(createUser);
 		res.status(HTTP_STATUS.CREATED).json({
 			success: true,
 			message: HTTP_MESSAGES.USER_CREATED,
@@ -20,13 +18,13 @@ export class UserController {
 	}
 
 	async findAll(req: ValidatedRequest, res: Response): Promise<void> {
-		const users: UserResponseDTO[] = await this.userService.getAllUsers();
+		const users = await this.userService.getAllUsers();
 		res.json({ success: true, users });
 	}
 
 	async findOne(req: ValidatedRequest, res: Response): Promise<void> {
 		const id = (req.validated?.params as Record<string, string>).userId;
-		const user: UserResponseDTO = await this.userService.getUserById(id);
+		const user = await this.userService.getUserById(id);
 
 		res.json({ success: true, user });
 	}
