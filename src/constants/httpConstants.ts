@@ -12,6 +12,7 @@ export const HTTP_MESSAGES = {
 	USER_CREATED: 'User created',
 	USER_UPDATED: 'User updated successfully',
 	USER_DELETED: 'User deleted',
+	USER_NOT_FOUND: 'User not found',
 	RESOURCE_NOT_FOUND: 'Resource not found',
 	INTERNAL_DATABASE_ERROR: 'Internal database error',
 	ROUTE_NOT_FOUND: 'Route not found',
