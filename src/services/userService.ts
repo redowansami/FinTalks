@@ -1,6 +1,6 @@
 import { User } from '../entities/userEntity';
 import { UserRepository } from '../repositories/userRepository';
-import { UserNotFoundException } from '../exceptions/UserNotFoundException';
+import { NotFoundError } from '../errors/customErrors';
 import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '../dtos/userDTO';
 
 export class UserService {
@@ -19,15 +19,14 @@ export class UserService {
 	async getUserById(id: string): Promise<UserResponseDTO> {
 		const user: UserResponseDTO | null = await this.userRepository.findById(id);
 		if (!user) {
-			throw new UserNotFoundException();
+			throw new NotFoundError('User not found');
 		}
 		return user;
 	}
 
-	async updateUser(id: string, updatedData: UpdateUserDTO): Promise<UserResponseDTO> {
+	async updateUser(id: string, updatedData: UpdateUserDTO): Promise<void> {
 		await this.getUserById(id);
-		const updated = await this.userRepository.update(id, updatedData as User);
-		return updated;
+		await this.userRepository.update(id, updatedData);
 	}
 
 	async deleteUser(id: string): Promise<void> {
