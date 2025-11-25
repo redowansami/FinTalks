@@ -1,13 +1,13 @@
 import { Entity, Column, OneToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './userEntity';
-import { LENTGH_CONSTRAINTS } from '../constants/constants';
+import { LENTGH_CONSTRAINTS } from '../constants/validationConstants';
 
 @Entity()
 export class Auth {
 	@PrimaryGeneratedColumn('uuid')
 	authId: string;
 
-	@Column({ length: LENTGH_CONSTRAINTS.PASSWORD_MAX })
+	@Column({ type: 'varchar', length: LENTGH_CONSTRAINTS.PASSWORD_MAX })
 	password: string;
 
 	@Column({ type: 'timestamp', nullable: true })

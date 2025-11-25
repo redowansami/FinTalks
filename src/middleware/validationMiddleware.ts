@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodType, z } from 'zod';
-import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/constants';
+import { ZodType } from 'zod';
 
 export interface ValidatedRequest extends Request {
 	validated?: {
@@ -18,11 +17,7 @@ export const validateRequest = (schemas: {
 			if (schemas.body) {
 				const result = await schemas.body.safeParseAsync(req.body);
 				if (!result.success) {
-					res.status(HTTP_STATUS.BAD_REQUEST).json({
-						message: HTTP_MESSAGES.VALIDATION_FAILED,
-						errors: z.treeifyError(result.error),
-					});
-					return;
+					throw result.error;
 				}
 				req.validated = { ...req.validated, body: result.data };
 			}
@@ -30,21 +25,14 @@ export const validateRequest = (schemas: {
 			if (schemas.params) {
 				const result = await schemas.params.safeParseAsync(req.params);
 				if (!result.success) {
-					res.status(HTTP_STATUS.BAD_REQUEST).json({
-						message: HTTP_MESSAGES.VALIDATION_FAILED,
-						errors: z.treeifyError(result.error),
-					});
-					return;
+					throw result.error;
 				}
 				req.validated = { ...req.validated, params: result.data };
 			}
 
 			next();
 		} catch (error: unknown) {
-			res.status(HTTP_STATUS.BAD_REQUEST).json({
-				message: HTTP_MESSAGES.VALIDATION_FAILED,
-				error: String(error),
-			});
+			next(error);
 		}
 	};
 };

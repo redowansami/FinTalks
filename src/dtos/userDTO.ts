@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import { UserRole } from '../entities/userEntity';
-import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/constants';
+import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validationConstants';
 
 export const createUserDTO = z
 	.object({
 		username: z
 			.string()
-			.min(LENTGH_CONSTRAINTS.NAME_MIN, VALIDATION_MESSAGES.USERNAME_MIN)
-			.max(10, VALIDATION_MESSAGES.USERNAME_MAX)
+			.min(LENTGH_CONSTRAINTS.USERNAME_MIN, VALIDATION_MESSAGES.USERNAME_MIN)
+			.max(LENTGH_CONSTRAINTS.USERNAME_MAX, VALIDATION_MESSAGES.USERNAME_MAX)
 			.trim(),
 		name: z
 			.string()

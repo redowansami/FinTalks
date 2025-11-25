@@ -5,7 +5,7 @@ import {
 	CreateDateColumn,
 	DeleteDateColumn,
 } from 'typeorm';
-import { LENTGH_CONSTRAINTS } from '../constants/constants';
+import { LENTGH_CONSTRAINTS } from '../constants/validationConstants';
 
 export enum UserRole {
 	ADMIN = 'ADMIN',
@@ -17,13 +17,13 @@ export class User {
 	@PrimaryGeneratedColumn('uuid')
 	userId: string;
 
-	@Column({ unique: true, length: LENTGH_CONSTRAINTS.USERNAME_MAX })
+	@Column({ type: 'varchar', unique: true, length: LENTGH_CONSTRAINTS.USERNAME_MAX })
 	username: string;
 
-	@Column({ length: LENTGH_CONSTRAINTS.NAME_MAX })
+	@Column({ type: 'varchar', length: LENTGH_CONSTRAINTS.NAME_MAX })
 	name: string;
 
-	@Column({ unique: true })
+	@Column({ type: 'varchar', unique: true })
 	email: string;
 
 	@CreateDateColumn({ type: 'timestamp' })

@@ -23,10 +23,9 @@ export class UserRepository {
 		return this.repository.findOne({ where: { userId: id } });
 	}
 
-	async update(id: string, user: User): Promise<User> {
-		await this.repository.update(id, user);
-		const updated = await this.repository.findOne({ where: { userId: id } });
-		return updated!;
+	async update(id: string, user: Partial<User>): Promise<boolean> {
+		const result = await this.repository.update(id, user);
+		return result.affected === 1;
 	}
 
 	async softDelete(id: string): Promise<boolean> {
