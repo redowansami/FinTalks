@@ -5,6 +5,10 @@ export const LENTGH_CONSTRAINTS = {
 	NAME_MAX: 25,
 	PASSWORD_MIN: 6,
 	PASSWORD_MAX: 15,
+	TITLE_MIN: 3,
+	TITLE_MAX: 100,
+	BODY_MIN: 10,
+	BODY_MAX: 5000,
 };
 
 export const VALIDATION_MESSAGES = {
@@ -14,4 +18,9 @@ export const VALIDATION_MESSAGES = {
 	NAME_MAX: 'Name must be at most 25 characters',
 	INVALID_EMAIL: 'Invalid email address',
 	INVALID_USER_ID: 'Invalid user ID format',
+	INVALID_STORY_ID: 'Invalid story ID format',
+	TITLE_MIN: 'Title should be at least 3 characters long',
+	TITLE_MAX: 'Title must be at most 100 characters',
+	BODY_MIN: 'Body should be at least 10 characters long',
+	BODY_MAX: 'Body must be at most 5000 characters',
 };
