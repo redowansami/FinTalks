@@ -91,7 +91,7 @@ export const errorHandler = (
 	return res.status(HTTP_STATUS.INTERNAL_ERROR).json(response);
 };
 
-export const notFoundHandler = (_req: Request, res: Response): Response => {
+export const routeNotFoundHandler = (_req: Request, res: Response): Response => {
 	const response: ErrorResponsePayload = {
 		success: false,
 		statusCode: HTTP_STATUS.NOT_FOUND,
