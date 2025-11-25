@@ -4,7 +4,9 @@ import { NotFoundError } from '../errors/customErrors';
 import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '../dtos/userDTO';
 
 export class UserService {
-	constructor(private readonly userRepository: UserRepository) {}
+	constructor(private readonly userRepository: UserRepository) {
+		this.userRepository = userRepository;
+	}
 
 	async createUser(data: CreateUserDTO): Promise<UserResponseDTO> {
 		const user: User = await this.userRepository.create(data);
