@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import asyncHandler from 'express-async-handler';
 import { userController } from '../containers/userContainer';
 import { validateRequest } from '../middleware/validationMiddleware';
 import { createUserDTO, updateUserDTO, userIdDTO } from '../dtos/userDTO';
@@ -7,18 +6,22 @@ import { createUserDTO, updateUserDTO, userIdDTO } from '../dtos/userDTO';
 const router = Router();
 
 router
-	.post('/', validateRequest({ body: createUserDTO }), asyncHandler(userController.create))
-	.get('/', asyncHandler(userController.findAll))
-	.get('/:userId', validateRequest({ params: userIdDTO }), asyncHandler(userController.findOne))
+	.post('/', validateRequest({ body: createUserDTO }), userController.create.bind(userController))
+	.get('/', userController.findAll.bind(userController))
+	.get(
+		'/:userId',
+		validateRequest({ params: userIdDTO }),
+		userController.findOne.bind(userController),
+	)
 	.patch(
 		'/:userId',
 		validateRequest({ params: userIdDTO, body: updateUserDTO }),
-		asyncHandler(userController.patchUpdate),
+		userController.patchUpdate.bind(userController),
 	)
 	.delete(
 		'/:userId',
 		validateRequest({ params: userIdDTO }),
-		asyncHandler(userController.delete),
+		userController.delete.bind(userController),
 	);
 
 export default router;
