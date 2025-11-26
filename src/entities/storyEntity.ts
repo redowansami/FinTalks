@@ -36,5 +36,5 @@ export class Story {
 
 	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'userId' })
-	user: User;
+	userByUserId: User;
 }
