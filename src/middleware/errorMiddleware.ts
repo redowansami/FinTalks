@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { ValidationError } from '../errors/customErrors';
 import { AppError } from '../errors/appError';
-import { handleZodError, handleDatabaseError } from '../errors/errorUtils';
+import { handleDatabaseError } from '../errors/errorUtils';
 import { HTTP_MESSAGES, HTTP_STATUS } from '../constants/httpConstants';
-import { ZodError } from 'zod';
 
 interface ErrorResponsePayload {
 	success: boolean;
@@ -26,22 +25,6 @@ export const errorHandler = (
 		stack: err.stack,
 		timestamp: new Date().toISOString(),
 	});
-
-	if (err instanceof ZodError) {
-		const validationError = handleZodError(err);
-		const response: ErrorResponsePayload = {
-			success: false,
-			statusCode: validationError.statusCode,
-			message: validationError.message,
-			errors: validationError.details,
-		};
-
-		if (isDevelopment) {
-			response.stack = err.stack;
-		}
-
-		return res.status(validationError.statusCode).json(response);
-	}
 
 	if (err instanceof AppError) {
 		const response: ErrorResponsePayload = {

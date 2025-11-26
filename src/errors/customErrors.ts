@@ -17,11 +17,8 @@ export class ValidationError extends AppError {
 	public readonly statusCode = HTTP_STATUS.BAD_REQUEST;
 	public readonly details: ValidationErrorDetail;
 
-	constructor(
-		message: string = HTTP_MESSAGES.VALIDATION_FAILED,
-		details: ValidationErrorDetail = {},
-	) {
-		super(message);
+	constructor(details: ValidationErrorDetail = {}, message?: string) {
+		super(message ?? HTTP_MESSAGES.VALIDATION_FAILED);
 		this.details = details;
 	}
 }

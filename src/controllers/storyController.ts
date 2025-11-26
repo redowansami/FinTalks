@@ -1,15 +1,13 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { StoryService } from '../services/storyService';
-import { CreateStoryDTO, UpdateStoryDTO } from '../dtos/storyDTO';
+import { UpdateStoryDTO } from '../dtos/storyDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
-import { ValidatedRequest } from '../middleware/validationMiddleware';
 
 export class StoryController {
 	constructor(private readonly storyService: StoryService) {}
 
-	create = async (req: ValidatedRequest, res: Response): Promise<void> => {
-		const createStory: CreateStoryDTO = req.validated?.body as CreateStoryDTO;
-		const result = await this.storyService.createStory(createStory);
+	create = async (req: Request, res: Response): Promise<void> => {
+		const result = await this.storyService.createStory(req.body);
 		res.status(HTTP_STATUS.CREATED).json({
 			success: true,
 			message: HTTP_MESSAGES.STORY_CREATED,
@@ -17,29 +15,28 @@ export class StoryController {
 		});
 	};
 
-	findAll = async (req: ValidatedRequest, res: Response): Promise<void> => {
+	findAll = async (req: Request, res: Response): Promise<void> => {
 		const stories = await this.storyService.getAllStories();
 		res.json({ success: true, stories });
 	};
 
-	findOne = async (req: ValidatedRequest, res: Response): Promise<void> => {
-		const id = (req.validated?.params as Record<string, string>).storyId;
-		const story = await this.storyService.getStoryById(id);
+	findOne = async (req: Request, res: Response): Promise<void> => {
+		const { storyId } = req.params;
+		const story = await this.storyService.getStoryById(storyId);
 
 		res.json({ success: true, story });
 	};
 
-	patchUpdate = async (req: ValidatedRequest, res: Response): Promise<void> => {
-		const id = (req.validated?.params as Record<string, string>).storyId;
-		const updateStory: UpdateStoryDTO = req.validated?.body as UpdateStoryDTO;
-		await this.storyService.updateStory(id, updateStory);
+	patchUpdate = async (req: Request, res: Response): Promise<void> => {
+		const { storyId } = req.params;
+		await this.storyService.updateStory(storyId, req.body as UpdateStoryDTO);
 
 		res.json({ success: true, message: HTTP_MESSAGES.STORY_UPDATED });
 	};
 
-	delete = async (req: ValidatedRequest, res: Response): Promise<void> => {
-		const id = (req.validated?.params as Record<string, string>).storyId;
-		await this.storyService.deleteStory(id);
+	delete = async (req: Request, res: Response): Promise<void> => {
+		const { storyId } = req.params;
+		await this.storyService.deleteStory(storyId);
 		res.json({ success: true, message: HTTP_MESSAGES.STORY_DELETED });
 	};
 }

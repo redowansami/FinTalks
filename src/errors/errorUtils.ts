@@ -1,17 +1,14 @@
-import { ValidationError, ValidationErrorDetail } from './customErrors';
+import { ValidationErrorDetail } from './customErrors';
 import { DatabaseError } from './customErrors';
 import { DATABASE_ERROR_CODES, DATABASE_ERROR_MESSAGES } from '../constants/databaseConstants';
 import { ZodError } from 'zod';
 
-export function handleZodError(error: ZodError): ValidationError {
-	const details: ValidationErrorDetail = {};
-
-	error.issues.forEach((err) => {
+export function formatZodError(error: ZodError): ValidationErrorDetail {
+	return error.issues.reduce((acc, err) => {
 		const path = err.path.join('.');
-		details[path] = err.message;
-	});
-
-	return new ValidationError('Validation failed', details);
+		acc[path] = err.message;
+		return acc;
+	}, {} as ValidationErrorDetail);
 }
 
 export function handleDatabaseError(error: unknown): DatabaseError {
