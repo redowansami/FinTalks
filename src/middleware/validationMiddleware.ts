@@ -6,7 +6,7 @@ import { formatZodError } from '../errors/errorUtils';
 export const validateRequest = (schemas: { body?: ZodType; params?: ZodType }) => {
 	return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		if (schemas.body) {
-			const result = await schemas.body.safeParseAsync(req.body);
+			const result = schemas.body.safeParse(req.body);
 			if (!result.success) {
 				throw new ValidationError(formatZodError(result.error));
 			}
@@ -14,7 +14,7 @@ export const validateRequest = (schemas: { body?: ZodType; params?: ZodType }) =
 		}
 
 		if (schemas.params) {
-			const result = await schemas.params.safeParseAsync(req.params);
+			const result = schemas.params.safeParse(req.params);
 			if (!result.success) {
 				throw new ValidationError(formatZodError(result.error));
 			}
