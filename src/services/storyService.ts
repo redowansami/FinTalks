@@ -3,18 +3,19 @@ import { StoryRepository } from '../repositories/storyRepository';
 import { NotFoundError } from '../errors/customErrors';
 import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO } from '../dtos/storyDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
+import { transformToDTO } from '../utils/mapper';
 
 export class StoryService {
 	constructor(private readonly storyRepository: StoryRepository) {}
 
 	async createStory(data: CreateStoryDTO): Promise<StoryResponseDTO> {
 		const story = await this.storyRepository.create(data);
-		return this.mapToResponseDTO(story);
+		return transformToDTO(StoryResponseDTO, story);
 	}
 
 	async getAllStories(): Promise<StoryResponseDTO[]> {
 		const stories: Story[] = await this.storyRepository.findAll();
-		return stories.map((story) => this.mapToResponseDTO(story));
+		return stories.map((story) => transformToDTO(StoryResponseDTO, story));
 	}
 
 	async getStoryById(id: string): Promise<StoryResponseDTO> {
@@ -22,7 +23,7 @@ export class StoryService {
 		if (!story) {
 			throw new NotFoundError(HTTP_MESSAGES.STORY_NOT_FOUND);
 		}
-		return this.mapToResponseDTO(story);
+		return transformToDTO(StoryResponseDTO, story);
 	}
 
 	async updateStory(id: string, updatedData: UpdateStoryDTO): Promise<void> {
@@ -33,16 +34,5 @@ export class StoryService {
 	async deleteStory(id: string): Promise<void> {
 		await this.getStoryById(id);
 		await this.storyRepository.softDelete(id);
-	}
-
-	private mapToResponseDTO(story: Story): StoryResponseDTO {
-		return {
-			storyId: story.storyId,
-			userId: story.userId,
-			title: story.title,
-			body: story.body,
-			createdAt: story.createdAt,
-			updatedAt: story.updatedAt,
-		};
 	}
 }

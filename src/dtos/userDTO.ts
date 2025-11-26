@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { UserRole } from '../entities/userEntity';
 import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validationConstants';
+import { Expose } from 'class-transformer';
 
 export const createUserDTO = z
 	.object({
@@ -21,13 +22,13 @@ export const createUserDTO = z
 
 export const updateUserDTO = createUserDTO.partial();
 
-export interface UserResponseDTO {
-	userId: string;
-	username: string;
-	name: string;
-	email: string;
-	joinDate: Date;
-	role: UserRole;
+export class UserResponseDTO {
+	@Expose() userId: string;
+	@Expose() username: string;
+	@Expose() name: string;
+	@Expose() email: string;
+	@Expose() joinDate: Date;
+	@Expose() role: string;
 }
 
 export const userIdDTO = z.object({

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validationConstants';
+import { Expose } from 'class-transformer';
 
 export const createStoryDTO = z
 	.object({
@@ -25,11 +26,11 @@ export type CreateStoryDTO = z.infer<typeof createStoryDTO>;
 export type UpdateStoryDTO = z.infer<typeof updateStoryDTO>;
 export type StoryIdDTO = z.infer<typeof storyIdDTO>;
 
-export interface StoryResponseDTO {
-	storyId: string;
-	userId: string;
-	title: string;
-	body: string;
-	createdAt: Date;
-	updatedAt: Date;
+export class StoryResponseDTO {
+	@Expose() storyId: string;
+	@Expose() userId: string;
+	@Expose() title: string;
+	@Expose() body: string;
+	@Expose() createdAt: Date;
+	@Expose() updatedAt: Date;
 }
