@@ -6,22 +6,14 @@ import { createUserDTO, updateUserDTO, userIdDTO } from '../dtos/userDTO';
 const router = Router();
 
 router
-	.post('/', validateRequest({ body: createUserDTO }), userController.create.bind(userController))
-	.get('/', userController.findAll.bind(userController))
-	.get(
-		'/:userId',
-		validateRequest({ params: userIdDTO }),
-		userController.findOne.bind(userController),
-	)
+	.post('/', validateRequest({ body: createUserDTO }), userController.create)
+	.get('/', userController.findAll)
+	.get('/:userId', validateRequest({ params: userIdDTO }), userController.findOne)
 	.patch(
 		'/:userId',
 		validateRequest({ params: userIdDTO, body: updateUserDTO }),
-		userController.patchUpdate.bind(userController),
+		userController.patchUpdate,
 	)
-	.delete(
-		'/:userId',
-		validateRequest({ params: userIdDTO }),
-		userController.delete.bind(userController),
-	);
+	.delete('/:userId', validateRequest({ params: userIdDTO }), userController.delete);
 
 export default router;

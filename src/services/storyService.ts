@@ -8,31 +8,31 @@ import { transformToDTO } from '../utils/mapper';
 export class StoryService {
 	constructor(private readonly storyRepository: StoryRepository) {}
 
-	async createStory(data: CreateStoryDTO): Promise<StoryResponseDTO> {
+	createStory = async (data: CreateStoryDTO): Promise<StoryResponseDTO> => {
 		const story = await this.storyRepository.create(data);
 		return transformToDTO(StoryResponseDTO, story);
-	}
+	};
 
-	async getAllStories(): Promise<StoryResponseDTO[]> {
+	getAllStories = async (): Promise<StoryResponseDTO[]> => {
 		const stories: Story[] = await this.storyRepository.findAll();
 		return stories.map((story) => transformToDTO(StoryResponseDTO, story));
-	}
+	};
 
-	async getStoryById(id: string): Promise<StoryResponseDTO> {
+	getStoryById = async (id: string): Promise<StoryResponseDTO> => {
 		const story: Story | null = await this.storyRepository.findById(id);
 		if (!story) {
 			throw new NotFoundError(HTTP_MESSAGES.STORY_NOT_FOUND);
 		}
 		return transformToDTO(StoryResponseDTO, story);
-	}
+	};
 
-	async updateStory(id: string, updatedData: UpdateStoryDTO): Promise<void> {
+	updateStory = async (id: string, updatedData: UpdateStoryDTO): Promise<void> => {
 		await this.getStoryById(id);
 		await this.storyRepository.update(id, updatedData);
-	}
+	};
 
-	async deleteStory(id: string): Promise<void> {
+	deleteStory = async (id: string): Promise<void> => {
 		await this.getStoryById(id);
 		await this.storyRepository.softDelete(id);
-	}
+	};
 }

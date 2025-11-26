@@ -10,26 +10,26 @@ export class StoryRepository {
 		this.repository = AppDataSource.getRepository(Story);
 	}
 
-	async create(data: CreateStoryDTO): Promise<Story> {
+	create = async (data: CreateStoryDTO): Promise<Story> => {
 		const story = this.repository.create(data);
 		return this.repository.save(story);
-	}
+	};
 
-	async findAll(): Promise<Story[]> {
+	findAll = async (): Promise<Story[]> => {
 		return this.repository.find();
-	}
+	};
 
-	async findById(id: string): Promise<Story | null> {
+	findById = async (id: string): Promise<Story | null> => {
 		return this.repository.findOne({ where: { storyId: id } });
-	}
+	};
 
-	async update(id: string, story: Partial<Story>): Promise<boolean> {
+	update = async (id: string, story: Partial<Story>): Promise<boolean> => {
 		const result = await this.repository.update(id, story);
 		return result.affected === 1;
-	}
+	};
 
-	async softDelete(id: string): Promise<boolean> {
+	softDelete = async (id: string): Promise<boolean> => {
 		const result = await this.repository.softDelete(id);
 		return result.affected === 1;
-	}
+	};
 }
