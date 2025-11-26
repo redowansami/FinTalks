@@ -10,26 +10,26 @@ export class UserRepository {
 		this.repository = AppDataSource.getRepository(User);
 	}
 
-	async create(data: CreateUserDTO): Promise<User> {
+	create = async (data: CreateUserDTO): Promise<User> => {
 		const user = this.repository.create(data);
 		return this.repository.save(user);
-	}
+	};
 
-	async findAll(): Promise<User[]> {
+	findAll = async (): Promise<User[]> => {
 		return this.repository.find();
-	}
+	};
 
-	async findById(id: string): Promise<User | null> {
+	findById = async (id: string): Promise<User | null> => {
 		return this.repository.findOne({ where: { userId: id } });
-	}
+	};
 
-	async update(id: string, user: Partial<User>): Promise<boolean> {
+	update = async (id: string, user: Partial<User>): Promise<boolean> => {
 		const result = await this.repository.update(id, user);
 		return result.affected === 1;
-	}
+	};
 
-	async softDelete(id: string): Promise<boolean> {
+	softDelete = async (id: string): Promise<boolean> => {
 		const result = await this.repository.softDelete(id);
 		return result.affected === 1;
-	}
+	};
 }

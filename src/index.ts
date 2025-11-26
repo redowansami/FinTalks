@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import { AppDataSource } from './config/dataSource';
 import userRoutes from './routes/userRoutes';
+import storyRoutes from './routes/storyRoutes';
 import { errorHandler, routeNotFoundHandler } from './middleware/errorMiddleware';
 
 dotenv.config();
@@ -12,6 +13,7 @@ const app = express();
 app.use(express.json());
 
 app.use(`/api/v1/users`, userRoutes);
+app.use(`/api/v1/stories`, storyRoutes);
 
 app.use(routeNotFoundHandler);
 

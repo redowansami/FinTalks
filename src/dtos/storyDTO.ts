@@ -1,0 +1,36 @@
+import { z } from 'zod';
+import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validationConstants';
+import { Expose } from 'class-transformer';
+
+export const createStoryDTO = z
+	.object({
+		userId: z.uuid(VALIDATION_MESSAGES.INVALID_USER_ID),
+		title: z
+			.string()
+			.min(LENTGH_CONSTRAINTS.TITLE_MIN, VALIDATION_MESSAGES.TITLE_MIN)
+			.max(LENTGH_CONSTRAINTS.TITLE_MAX, VALIDATION_MESSAGES.TITLE_MAX),
+		body: z
+			.string()
+			.min(LENTGH_CONSTRAINTS.BODY_MIN, VALIDATION_MESSAGES.BODY_MIN)
+			.max(LENTGH_CONSTRAINTS.BODY_MAX, VALIDATION_MESSAGES.BODY_MAX),
+	})
+	.strict();
+
+export const updateStoryDTO = createStoryDTO.partial().omit({ userId: true }).strict();
+
+export const storyIdDTO = z.object({
+	storyId: z.uuid(VALIDATION_MESSAGES.INVALID_STORY_ID),
+});
+
+export type CreateStoryDTO = z.infer<typeof createStoryDTO>;
+export type UpdateStoryDTO = z.infer<typeof updateStoryDTO>;
+export type StoryIdDTO = z.infer<typeof storyIdDTO>;
+
+export class StoryResponseDTO {
+	@Expose() storyId: string;
+	@Expose() userId: string;
+	@Expose() title: string;
+	@Expose() body: string;
+	@Expose() createdAt: Date;
+	@Expose() updatedAt: Date;
+}

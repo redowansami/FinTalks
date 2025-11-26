@@ -32,6 +32,9 @@
   },
   "homepage": "https://github.com/redowansami/FinTalks#readme",
   "dependencies": {
+    "@automapper/classes": "^8.8.1",
+    "@automapper/core": "^8.8.1",
+    "class-transformer": "^0.5.1",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",

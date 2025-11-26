@@ -8,7 +8,7 @@ export class Auth {
 	authId: string;
 
 	@Column({ type: 'varchar', length: LENTGH_CONSTRAINTS.PASSWORD_MAX })
-	password: string;
+	hashedPassword: string;
 
 	@Column({ type: 'timestamp', nullable: true })
 	passwordLastModificationTime: Date;
@@ -17,5 +17,5 @@ export class Auth {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
-	user: User;
+	userByUserId: User;
 }
