@@ -3,7 +3,7 @@ import { ZodType } from 'zod';
 import { ErrorFactory } from '../errors/errorFactory';
 import { formatZodError } from '../errors/errorUtils';
 
-export const validateRequest = (schemas: { body?: ZodType; params?: ZodType }) => {
+export const validateRequest = (schemas: { body?: ZodType; params?: ZodType; query?: ZodType }) => {
 	return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		if (schemas.body) {
 			const result = schemas.body.safeParse(req.body);
@@ -18,7 +18,16 @@ export const validateRequest = (schemas: { body?: ZodType; params?: ZodType }) =
 			if (!result.success) {
 				throw ErrorFactory.validation(formatZodError(result.error));
 			}
-			req.params = result.data as any;
+			req.params = result.data as Record<string, string>;
+		}
+
+		if (schemas.query) {
+			const result = schemas.query.safeParse(req.query);
+			if (!result.success) {
+				throw ErrorFactory.validation(formatZodError(result.error));
+			}
+			const params = new URLSearchParams(result.data as Record<string, string>);
+			req.url = `${req.path}?${params.toString()}`;
 		}
 
 		next();
