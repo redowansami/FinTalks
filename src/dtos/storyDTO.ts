@@ -22,9 +22,15 @@ export const storyIdDTO = z.object({
 	storyId: z.uuid(VALIDATION_MESSAGES.INVALID_STORY_ID),
 });
 
+export const paginationQueryDTO = z.object({
+	startAfter: z.string().min(1, 'Invalid cursor format').optional(),
+	limit: z.coerce.number().int().positive().max(100).default(10),
+});
+
 export type CreateStoryDTO = z.infer<typeof createStoryDTO>;
 export type UpdateStoryDTO = z.infer<typeof updateStoryDTO>;
 export type StoryIdDTO = z.infer<typeof storyIdDTO>;
+export type PaginationQueryDTO = z.infer<typeof paginationQueryDTO>;
 
 export class StoryResponseDTO {
 	@Expose() storyId: string;

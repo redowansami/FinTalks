@@ -16,8 +16,12 @@ export class StoryController {
 	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
-		const stories = await this.storyService.getAllStories();
-		res.json({ success: true, stories });
+		const { startAfter, limit } = req.query;
+		const result = await this.storyService.getAllStoriesPaginated(
+			startAfter as string | undefined,
+			Number(limit),
+		);
+		res.json({ success: true, ...result });
 	};
 
 	findOne = async (req: Request, res: Response): Promise<void> => {

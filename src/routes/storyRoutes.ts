@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { storyController } from '../containers/storyContainer';
 import { validateRequest } from '../middleware/validationMiddleware';
-import { createStoryDTO, updateStoryDTO, storyIdDTO } from '../dtos/storyDTO';
+import { createStoryDTO, updateStoryDTO, storyIdDTO, paginationQueryDTO } from '../dtos/storyDTO';
 
 const router = Router();
 
 router
 	.post('/', validateRequest({ body: createStoryDTO }), storyController.create)
-	.get('/', storyController.findAll)
+	.get('/', validateRequest({ query: paginationQueryDTO }), storyController.findAll)
 	.get('/:storyId', validateRequest({ params: storyIdDTO }), storyController.findOne)
 	.patch(
 		'/:storyId',

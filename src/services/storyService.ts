@@ -4,6 +4,7 @@ import { ErrorFactory } from '../errors/errorFactory';
 import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO } from '../dtos/storyDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
+import { CursorEncoder } from '../utils/cursorEncoder';
 
 export class StoryService {
 	constructor(private readonly storyRepository: StoryRepository) {}
@@ -16,6 +17,20 @@ export class StoryService {
 	getAllStories = async (): Promise<StoryResponseDTO[]> => {
 		const stories: Story[] = await this.storyRepository.findAll();
 		return stories.map((story) => transformToDTO(StoryResponseDTO, story));
+	};
+
+	getAllStoriesPaginated = async (
+		startAfter: string | undefined,
+		limit: number,
+	): Promise<{ items: StoryResponseDTO[]; nextCursor: string | null }> => {
+		const decodedCursor = startAfter ? CursorEncoder.decode(startAfter) : undefined;
+		const stories = await this.storyRepository.findPaginated(decodedCursor, limit + 1);
+		const hasMore = stories.length > limit;
+		const items = stories
+			.slice(0, limit)
+			.map((story) => transformToDTO(StoryResponseDTO, story));
+		const nextCursor = hasMore ? CursorEncoder.encode(items[items.length - 1].storyId) : null;
+		return { items, nextCursor };
 	};
 
 	getStoryById = async (id: string): Promise<StoryResponseDTO> => {
