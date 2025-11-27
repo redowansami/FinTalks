@@ -14,6 +14,7 @@ export const LENTGH_CONSTRAINTS = {
 export const VALIDATION_MESSAGES = {
 	USERNAME_MIN: 'Username should be at least 3 characters long',
 	USERNAME_MAX: 'Username must be at most 10 characters',
+	USERNAME_INVALID: 'Username can only contain letters, numbers, and underscores',
 	NAME_MIN: 'Name should be at least 3 characters long',
 	NAME_MAX: 'Name must be at most 25 characters',
 	INVALID_EMAIL: 'Invalid email address',
