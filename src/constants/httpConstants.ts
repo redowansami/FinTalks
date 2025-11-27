@@ -5,6 +5,7 @@ export const HTTP_STATUS = {
 	UNAUTHORIZED: 401,
 	FORBIDDEN: 403,
 	NOT_FOUND: 404,
+	CONFLICT: 409,
 	INTERNAL_ERROR: 500,
 };
 
@@ -24,4 +25,7 @@ export const HTTP_MESSAGES = {
 	UNAUTHORIZED: 'Unauthorized Access',
 	FORBIDDEN: 'Forbidden',
 	INTERNAL_ERROR: 'Internal error occurred',
+	CONFLICT_ERROR: 'Conflict error occurred',
+	USERNAME_ALREADY_EXISTS: 'Username already exists',
+	EMAIL_ALREADY_EXISTS: 'Email already exists',
 };

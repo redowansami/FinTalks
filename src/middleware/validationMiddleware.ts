@@ -1,33 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodType } from 'zod';
-import { handleZodError } from '../errors/errorUtils';
+import { ErrorFactory } from '../errors/errorFactory';
+import { formatZodError } from '../errors/errorUtils';
 
-export interface ValidatedRequest extends Request {
-	validated?: {
-		body?: unknown;
-		params?: unknown;
-	};
-}
-
-export const validateRequest = (schemas: {
-	body?: ZodType;
-	params?: ZodType;
-}): ((req: ValidatedRequest, res: Response, next: NextFunction) => Promise<void>) => {
-	return async (req: ValidatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const validateRequest = (schemas: { body?: ZodType; params?: ZodType }) => {
+	return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		if (schemas.body) {
-			const result = await schemas.body.safeParseAsync(req.body);
+			const result = schemas.body.safeParse(req.body);
 			if (!result.success) {
-				throw handleZodError(result.error);
+				throw ErrorFactory.validation(formatZodError(result.error));
 			}
-			req.validated = { ...req.validated, body: result.data };
+			req.body = result.data;
 		}
 
 		if (schemas.params) {
-			const result = await schemas.params.safeParseAsync(req.params);
+			const result = schemas.params.safeParse(req.params);
 			if (!result.success) {
-				throw handleZodError(result.error);
+				throw ErrorFactory.validation(formatZodError(result.error));
 			}
-			req.validated = { ...req.validated, params: result.data };
+			req.params = result.data as any;
 		}
 
 		next();

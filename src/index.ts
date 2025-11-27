@@ -1,13 +1,11 @@
-import dotenv from 'dotenv';
 import express from 'express';
 import { AppDataSource } from './config/dataSource';
 import userRoutes from './routes/userRoutes';
 import storyRoutes from './routes/storyRoutes';
 import { errorHandler, routeNotFoundHandler } from './middleware/errorMiddleware';
+import { env } from './utils/envParser';
 
-dotenv.config();
-
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
 const app = express();
 
 app.use(express.json());
@@ -21,9 +19,9 @@ app.use(errorHandler);
 
 AppDataSource.initialize()
 	.then(() => {
-		console.log('Database connected');
+		console.log('Database connected successfully');
 		app.listen(PORT, () => {
-			console.log(`Server is running on port : ${PORT}`);
+			console.log(`Server is running on port: ${PORT}`);
 		});
 	})
 	.catch((err) => console.error('Error during initialization', err));
