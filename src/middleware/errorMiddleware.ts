@@ -13,7 +13,7 @@ interface ErrorResponsePayload {
 }
 
 export const errorHandler = (
-	err: Error | AppError,
+	err: Error,
 	_req: Request,
 	res: Response,
 	_next: NextFunction,

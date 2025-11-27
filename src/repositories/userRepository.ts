@@ -23,6 +23,14 @@ export class UserRepository {
 		return this.repository.findOne({ where: { userId: id } });
 	};
 
+	findByUsername = async (username: string): Promise<User | null> => {
+		return this.repository.findOne({ where: { username } });
+	};
+
+	findByEmail = async (email: string): Promise<User | null> => {
+		return this.repository.findOne({ where: { email } });
+	};
+
 	update = async (id: string, user: Partial<User>): Promise<boolean> => {
 		const result = await this.repository.update(id, user);
 		return result.affected === 1;

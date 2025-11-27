@@ -1,6 +1,6 @@
 import { Story } from '../entities/storyEntity';
 import { StoryRepository } from '../repositories/storyRepository';
-import { NotFoundError } from '../errors/customErrors';
+import { ErrorFactory } from '../errors/errorFactory';
 import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO } from '../dtos/storyDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
@@ -21,7 +21,7 @@ export class StoryService {
 	getStoryById = async (id: string): Promise<StoryResponseDTO> => {
 		const story: Story | null = await this.storyRepository.findById(id);
 		if (!story) {
-			throw new NotFoundError(HTTP_MESSAGES.STORY_NOT_FOUND);
+			throw ErrorFactory.notFound(HTTP_MESSAGES.STORY_NOT_FOUND);
 		}
 		return transformToDTO(StoryResponseDTO, story);
 	};

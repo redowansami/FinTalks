@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodType } from 'zod';
-import { ValidationError } from '../errors/customErrors';
+import { ErrorFactory } from '../errors/errorFactory';
 import { formatZodError } from '../errors/errorUtils';
 
 export const validateRequest = (schemas: { body?: ZodType; params?: ZodType }) => {
@@ -8,7 +8,7 @@ export const validateRequest = (schemas: { body?: ZodType; params?: ZodType }) =
 		if (schemas.body) {
 			const result = schemas.body.safeParse(req.body);
 			if (!result.success) {
-				throw new ValidationError(formatZodError(result.error));
+				throw ErrorFactory.validation(formatZodError(result.error));
 			}
 			req.body = result.data;
 		}
@@ -16,7 +16,7 @@ export const validateRequest = (schemas: { body?: ZodType; params?: ZodType }) =
 		if (schemas.params) {
 			const result = schemas.params.safeParse(req.params);
 			if (!result.success) {
-				throw new ValidationError(formatZodError(result.error));
+				throw ErrorFactory.validation(formatZodError(result.error));
 			}
 			req.params = result.data as any;
 		}

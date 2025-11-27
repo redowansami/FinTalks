@@ -46,3 +46,11 @@ export class DatabaseError extends AppError {
 		super(message);
 	}
 }
+
+export class ConflictError extends AppError {
+	public readonly statusCode = HTTP_STATUS.CONFLICT;
+
+	constructor(message: string = HTTP_MESSAGES.CONFLICT_ERROR) {
+		super(message);
+	}
+}
