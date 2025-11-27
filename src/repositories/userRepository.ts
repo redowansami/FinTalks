@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../config/dataSource';
 import { User } from '../entities/userEntity';
 import { CreateUserDTO } from 'dtos/userDTO';
+import { buildCursorPaginationQuery } from '../utils/paginationQuery';
 
 export class UserRepository {
 	private repository: Repository<User>;
@@ -17,6 +18,12 @@ export class UserRepository {
 
 	findAll = async (): Promise<User[]> => {
 		return this.repository.find();
+	};
+
+	findPaginated = async (startAfter: string | undefined, limit: number): Promise<User[]> => {
+		const queryBuilder = this.repository.createQueryBuilder('user');
+		buildCursorPaginationQuery(queryBuilder, 'user.userId', startAfter, limit);
+		return queryBuilder.getMany();
 	};
 
 	findById = async (id: string): Promise<User | null> => {

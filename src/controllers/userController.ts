@@ -16,8 +16,12 @@ export class UserController {
 	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
-		const users = await this.userService.getAllUsers();
-		res.json({ success: true, users });
+		const { startAfter, limit } = req.query;
+		const result = await this.userService.getAllUsersPaginated(
+			startAfter as string | undefined,
+			Number(limit),
+		);
+		res.json({ success: true, ...result });
 	};
 
 	findOne = async (req: Request, res: Response): Promise<void> => {

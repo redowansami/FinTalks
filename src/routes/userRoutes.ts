@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { userController } from '../containers/userContainer';
 import { validateRequest } from '../middleware/validationMiddleware';
-import { createUserDTO, updateUserDTO, userIdDTO } from '../dtos/userDTO';
+import { createUserDTO, updateUserDTO, userIdDTO, paginationQueryDTO } from '../dtos/userDTO';
 
 const router = Router();
 
 router
 	.post('/', validateRequest({ body: createUserDTO }), userController.create)
-	.get('/', userController.findAll)
+	.get('/', validateRequest({ query: paginationQueryDTO }), userController.findAll)
 	.get('/:userId', validateRequest({ params: userIdDTO }), userController.findOne)
 	.patch(
 		'/:userId',

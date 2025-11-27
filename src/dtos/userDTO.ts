@@ -36,6 +36,12 @@ export const userIdDTO = z.object({
 	userId: z.uuid('Invalid user ID format'),
 });
 
+export const paginationQueryDTO = z.object({
+	startAfter: z.string().min(1, 'Invalid cursor format').optional(),
+	limit: z.coerce.number().int().positive().max(100).default(5),
+});
+
 export type CreateUserDTO = z.infer<typeof createUserDTO>;
 export type UpdateUserDTO = z.infer<typeof updateUserDTO>;
 export type UserIdDTO = z.infer<typeof userIdDTO>;
+export type PaginationQueryDTO = z.infer<typeof paginationQueryDTO>;
