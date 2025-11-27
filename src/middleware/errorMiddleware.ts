@@ -3,6 +3,7 @@ import { ValidationError } from '../errors/customErrors';
 import { AppError } from '../errors/appError';
 import { handleDatabaseError } from '../errors/errorUtils';
 import { HTTP_MESSAGES, HTTP_STATUS } from '../constants/httpConstants';
+import { env } from '../utils/envParser';
 
 interface ErrorResponsePayload {
 	success: boolean;
@@ -18,7 +19,7 @@ export const errorHandler = (
 	res: Response,
 	_next: NextFunction,
 ): Response => {
-	const isDevelopment = process.env.NODE_ENV === 'development';
+	const isDevelopment = env.NODE_ENV === 'development';
 	console.error('Error:', {
 		name: err.name,
 		message: err.message,
