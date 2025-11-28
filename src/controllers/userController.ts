@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
-import { UpdateUserDTO } from '../dtos/userDTO';
+import { UpdateUserDTO, UserQueryDTO, userQueryDTO } from '../dtos/userDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
+import { parseWithSchema } from '../utils/mapper';
 
 export class UserController {
 	constructor(private readonly userService: UserService) {}
@@ -16,11 +17,8 @@ export class UserController {
 	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
-		const { startAfter, limit } = req.query;
-		const result = await this.userService.getAllUsersPaginated(
-			startAfter as string | undefined,
-			Number(limit),
-		);
+		const queryParams = parseWithSchema<UserQueryDTO>(userQueryDTO, req.query);
+		const result = await this.userService.getAllUsersPaginated(queryParams);
 		res.json({ success: true, ...result });
 	};
 

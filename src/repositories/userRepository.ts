@@ -1,8 +1,9 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../config/dataSource';
 import { User } from '../entities/userEntity';
-import { CreateUserDTO } from 'dtos/userDTO';
+import { CreateUserDTO, UserQueryDTO } from 'dtos/userDTO';
 import { buildCursorPaginationQuery } from '../utils/paginationQuery';
+import { applyFuzzySearch } from '../utils/fuzzySearch';
 
 export class UserRepository {
 	private repository: Repository<User>;
@@ -16,13 +17,21 @@ export class UserRepository {
 		return this.repository.save(user);
 	};
 
-	findAll = async (): Promise<User[]> => {
-		return this.repository.find();
-	};
-
-	findPaginated = async (startAfter: string | undefined, limit: number): Promise<User[]> => {
+	findPaginated = async (queryParams: UserQueryDTO): Promise<User[]> => {
+		const { search, orderBy, startAfter, limit } = queryParams;
 		const queryBuilder = this.repository.createQueryBuilder('user');
-		buildCursorPaginationQuery(queryBuilder, 'user.userId', startAfter, limit);
+
+		if (search && search.trim()) {
+			applyFuzzySearch(queryBuilder, {
+				'user.name': search,
+				'user.username': search,
+				'user.email': search,
+			});
+		}
+
+		const orderByField = orderBy ? `user.${orderBy}` : 'user.userId';
+		buildCursorPaginationQuery(queryBuilder, 'user.userId', startAfter, limit, orderByField);
+
 		return queryBuilder.getMany();
 	};
 

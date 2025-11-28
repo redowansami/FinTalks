@@ -1,6 +1,6 @@
 import { UserRepository } from '../repositories/userRepository';
 import { ErrorFactory } from '../errors/errorFactory';
-import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '../dtos/userDTO';
+import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../dtos/userDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { CursorEncoder } from '../utils/cursorEncoder';
@@ -23,20 +23,25 @@ export class UserService {
 		return transformToDTO(UserResponseDTO, user);
 	};
 
-	getAllUsers = async (): Promise<UserResponseDTO[]> => {
-		const users = await this.userRepository.findAll();
-		return users.map((user) => transformToDTO(UserResponseDTO, user));
-	};
-
 	getAllUsersPaginated = async (
-		startAfter: string | undefined,
-		limit: number,
+		queryParams: UserQueryDTO,
 	): Promise<{ items: UserResponseDTO[]; nextCursor: string | null }> => {
-		const decodedCursor = startAfter ? CursorEncoder.decode(startAfter) : undefined;
-		const users = await this.userRepository.findPaginated(decodedCursor, limit + 1);
-		const hasMore = users.length > limit;
-		const items = users.slice(0, limit).map((user) => transformToDTO(UserResponseDTO, user));
+		const decodedCursor = queryParams.startAfter
+			? CursorEncoder.decode(queryParams.startAfter)
+			: undefined;
+
+		const users = await this.userRepository.findPaginated({
+			...queryParams,
+			startAfter: decodedCursor,
+			limit: queryParams.limit + 1,
+		});
+
+		const hasMore = users.length > queryParams.limit;
+		const items = users
+			.slice(0, queryParams.limit)
+			.map((user) => transformToDTO(UserResponseDTO, user));
 		const nextCursor = hasMore ? CursorEncoder.encode(items[items.length - 1].userId) : null;
+
 		return { items, nextCursor };
 	};
 

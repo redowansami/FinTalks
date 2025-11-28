@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --watch './**/*.ts' --exec ts-node src/index.ts",
+    "setup:fuzzy": "ts-node src/setup-fuzzy-search.ts",
+    "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/config/dataSource.ts",
+    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/config/dataSource.ts",
     "lint": "eslint 'src/**/*.{ts,tsx}' --fix",
     "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,json,md,mjs,css}'",
     "prepare": "husky"
