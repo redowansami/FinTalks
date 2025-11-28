@@ -9,3 +9,18 @@ export const DATABASE_ERROR_MESSAGES = {
 	OPERATION_FAILED: 'Database operation failed',
 	UNKNOWN_ERROR: 'An unknown database error occurred',
 };
+
+export enum UserOrderByFields {
+	USER_ID = 'userId',
+	USERNAME = 'username',
+	NAME = 'name',
+	EMAIL = 'email',
+	JOIN_DATE = 'joinDate',
+}
+
+export enum StoryOrderByFields {
+	STORY_ID = 'storyId',
+	TITLE = 'title',
+	CREATED_AT = 'createdAt',
+	UPDATED_AT = 'updatedAt',
+}

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { UserRole } from '../entities/userEntity';
 import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validationConstants';
+import { UserOrderByFields } from '../constants/databaseConstants';
 import { Expose } from 'class-transformer';
 
 export const createUserDTO = z
@@ -36,12 +37,14 @@ export const userIdDTO = z.object({
 	userId: z.uuid('Invalid user ID format'),
 });
 
-export const paginationQueryDTO = z.object({
+export const userQueryDTO = z.object({
+	search: z.string().optional(),
+	orderBy: z.enum(UserOrderByFields).optional(),
 	startAfter: z.string().min(1, 'Invalid cursor format').optional(),
-	limit: z.coerce.number().int().positive().max(100).default(5),
+	limit: z.coerce.number().int().positive().max(100).default(2),
 });
 
 export type CreateUserDTO = z.infer<typeof createUserDTO>;
 export type UpdateUserDTO = z.infer<typeof updateUserDTO>;
 export type UserIdDTO = z.infer<typeof userIdDTO>;
-export type PaginationQueryDTO = z.infer<typeof paginationQueryDTO>;
+export type UserQueryDTO = z.infer<typeof userQueryDTO>;
