@@ -1,7 +1,7 @@
 import { Story } from '../entities/storyEntity';
 import { StoryRepository } from '../repositories/storyRepository';
 import { ErrorFactory } from '../errors/errorFactory';
-import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO } from '../dtos/storyDTO';
+import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO, StoryQueryDTO } from '../dtos/storyDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { CursorEncoder } from '../utils/cursorEncoder';
@@ -14,22 +14,25 @@ export class StoryService {
 		return transformToDTO(StoryResponseDTO, story);
 	};
 
-	getAllStories = async (): Promise<StoryResponseDTO[]> => {
-		const stories: Story[] = await this.storyRepository.findAll();
-		return stories.map((story) => transformToDTO(StoryResponseDTO, story));
-	};
-
 	getAllStoriesPaginated = async (
-		startAfter: string | undefined,
-		limit: number,
+		queryParams: StoryQueryDTO,
 	): Promise<{ items: StoryResponseDTO[]; nextCursor: string | null }> => {
-		const decodedCursor = startAfter ? CursorEncoder.decode(startAfter) : undefined;
-		const stories = await this.storyRepository.findPaginated(decodedCursor, limit + 1);
-		const hasMore = stories.length > limit;
+		const decodedCursor = queryParams.startAfter
+			? CursorEncoder.decode(queryParams.startAfter)
+			: undefined;
+
+		const stories = await this.storyRepository.findPaginated({
+			...queryParams,
+			startAfter: decodedCursor,
+			limit: queryParams.limit + 1,
+		});
+
+		const hasMore = stories.length > queryParams.limit;
 		const items = stories
-			.slice(0, limit)
+			.slice(0, queryParams.limit)
 			.map((story) => transformToDTO(StoryResponseDTO, story));
 		const nextCursor = hasMore ? CursorEncoder.encode(items[items.length - 1].storyId) : null;
+
 		return { items, nextCursor };
 	};
 

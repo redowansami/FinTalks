@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { StoryService } from '../services/storyService';
-import { UpdateStoryDTO } from '../dtos/storyDTO';
+import { StoryQueryDTO, UpdateStoryDTO, storyQueryDTO } from '../dtos/storyDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
+import { parseWithSchema } from '../utils/mapper';
 
 export class StoryController {
 	constructor(private readonly storyService: StoryService) {}
@@ -16,11 +17,9 @@ export class StoryController {
 	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
-		const { startAfter, limit } = req.query;
-		const result = await this.storyService.getAllStoriesPaginated(
-			startAfter as string | undefined,
-			Number(limit),
-		);
+		const queryParams = parseWithSchema<StoryQueryDTO>(storyQueryDTO, req.query);
+
+		const result = await this.storyService.getAllStoriesPaginated(queryParams);
 		res.json({ success: true, ...result });
 	};
 

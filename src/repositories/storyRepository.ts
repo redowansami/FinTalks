@@ -1,8 +1,9 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../config/dataSource';
 import { Story } from '../entities/storyEntity';
-import { CreateStoryDTO } from '../dtos/storyDTO';
+import { CreateStoryDTO, StoryQueryDTO } from '../dtos/storyDTO';
 import { buildCursorPaginationQuery } from '../utils/paginationQuery';
+import { applyFuzzySearch } from '../utils/fuzzySearch';
 
 export class StoryRepository {
 	private repository: Repository<Story>;
@@ -16,13 +17,25 @@ export class StoryRepository {
 		return this.repository.save(story);
 	};
 
-	findAll = async (): Promise<Story[]> => {
-		return this.repository.find();
-	};
+	findPaginated = async (queryParams: StoryQueryDTO): Promise<Story[]> => {
+		const { search, orderBy, startAfter, limit } = queryParams;
+		const queryBuilder = this.repository
+			.createQueryBuilder('story')
+			.leftJoinAndSelect('story.userByUserId', 'user');
 
-	findPaginated = async (startAfter: string | undefined, limit: number): Promise<Story[]> => {
-		const queryBuilder = this.repository.createQueryBuilder('story');
+		if (search && search.trim()) {
+			applyFuzzySearch(queryBuilder, {
+				'story.title': search,
+				'user.name': search,
+			});
+		}
+
+		if (orderBy) {
+			queryBuilder.orderBy(`story.${orderBy}`, 'ASC');
+		}
+
 		buildCursorPaginationQuery(queryBuilder, 'story.storyId', startAfter, limit);
+
 		return queryBuilder.getMany();
 	};
 
