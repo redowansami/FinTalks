@@ -5,10 +5,15 @@ export function buildCursorPaginationQuery<T extends ObjectLiteral>(
 	cursorField: string,
 	cursorValue: string | undefined,
 	limit: number,
+	orderBy?: string,
 ): SelectQueryBuilder<T> {
+	if (orderBy) {
+		queryBuilder.orderBy(orderBy, 'ASC');
+	}
+
 	if (cursorValue) {
 		queryBuilder.andWhere(`${cursorField} > :cursorValue`, { cursorValue });
 	}
 
-	return queryBuilder.orderBy(cursorField, 'ASC').limit(limit);
+	return queryBuilder.addOrderBy(cursorField, 'ASC').limit(limit);
 }
