@@ -6,20 +6,14 @@ export const applyFuzzySearch = <T extends ObjectLiteral>(
 ): SelectQueryBuilder<T> => {
 	const conditions: string[] = [];
 	const parameters: Record<string, string> = {};
-	let index = 0;
 
 	Object.entries(searchFields).forEach(([field, value]) => {
 		if (value && value.trim()) {
 			const paramName = field.replace(/\./g, '_');
 			const paramValue = value.trim();
-			const uniqueParamName = `${paramName}_${index}`;
 
-			conditions.push(
-				`(${field} ILIKE :${uniqueParamName}_like OR similarity(${field}, :${uniqueParamName}_sim) > 0.3)`,
-			);
-			parameters[`${uniqueParamName}_like`] = `%${paramValue}%`;
-			parameters[`${uniqueParamName}_sim`] = paramValue;
-			index++;
+			conditions.push(`${field} ILIKE :${paramName}`);
+			parameters[paramName] = `%${paramValue}%`;
 		}
 	});
 
