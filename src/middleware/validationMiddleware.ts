@@ -26,7 +26,8 @@ export const validateRequest = (schemas: { body?: ZodType; params?: ZodType; que
 			if (!result.success) {
 				throw ErrorFactory.validation(formatZodError(result.error));
 			}
-			req.query = result.data as Record<string, any>;
+			const params = new URLSearchParams(result.data as Record<string, string>);
+			req.url = `${req.path}?${params.toString()}`;
 		}
 
 		next();

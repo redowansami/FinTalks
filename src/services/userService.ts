@@ -3,7 +3,6 @@ import { ErrorFactory } from '../errors/errorFactory';
 import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../dtos/userDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
-import { CursorEncoder } from '../utils/cursorEncoder';
 
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
@@ -26,13 +25,11 @@ export class UserService {
 	getAllUsersPaginated = async (
 		queryParams: UserQueryDTO,
 	): Promise<{ items: UserResponseDTO[]; nextCursor: string | null }> => {
-		const decodedCursor = queryParams.startAfter
-			? CursorEncoder.decode(queryParams.startAfter)
-			: undefined;
+		const cursor = queryParams.startAfter;
 
 		const users = await this.userRepository.findPaginated({
 			...queryParams,
-			startAfter: decodedCursor,
+			startAfter: cursor,
 			limit: queryParams.limit + 1,
 		});
 
@@ -40,7 +37,7 @@ export class UserService {
 		const items = users
 			.slice(0, queryParams.limit)
 			.map((user) => transformToDTO(UserResponseDTO, user));
-		const nextCursor = hasMore ? CursorEncoder.encode(items[items.length - 1].userId) : null;
+		const nextCursor = hasMore ? items[items.length - 1].userId : null;
 
 		return { items, nextCursor };
 	};
