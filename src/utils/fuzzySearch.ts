@@ -9,11 +9,10 @@ export const applyFuzzySearch = <T extends ObjectLiteral>(
 
 	Object.entries(searchFields).forEach(([field, value]) => {
 		if (value && value.trim()) {
-			const paramName = field.replace(/\./g, '_');
 			const paramValue = value.trim();
 
-			conditions.push(`${field} ILIKE :${paramName}`);
-			parameters[paramName] = `%${paramValue}%`;
+			conditions.push(`${field} ILIKE :${field}`);
+			parameters[field] = `%${paramValue}%`;
 		}
 	});
 
