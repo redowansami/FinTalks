@@ -29,26 +29,3 @@ export const applyFuzzySearch = <T extends ObjectLiteral>(
 
 	return queryBuilder;
 };
-
-export const applyDateRange = <T extends ObjectLiteral>(
-	queryBuilder: SelectQueryBuilder<T>,
-	dateField: string,
-	startDate?: string,
-	endDate?: string,
-): SelectQueryBuilder<T> => {
-	if (startDate) {
-		const paramName = `${dateField.replace('.', '_')}_start`;
-		queryBuilder.andWhere(`${dateField} >= :${paramName}`, {
-			[paramName]: startDate,
-		});
-	}
-
-	if (endDate) {
-		const paramName = `${dateField.replace('.', '_')}_end`;
-		queryBuilder.andWhere(`${dateField} <= :${paramName}`, {
-			[paramName]: endDate,
-		});
-	}
-
-	return queryBuilder;
-};
