@@ -37,7 +37,13 @@ export class UserService {
 		const items = users
 			.slice(0, queryParams.limit)
 			.map((user) => transformToDTO(UserResponseDTO, user));
-		const nextCursor = hasMore ? items[items.length - 1].userId : null;
+
+		let nextCursor: string | null = null;
+		if (hasMore) {
+			const lastItem = items[items.length - 1];
+			const orderByField = queryParams.orderBy || 'userId';
+			nextCursor = String(lastItem[orderByField as keyof UserResponseDTO]);
+		}
 
 		return { items, nextCursor };
 	};

@@ -30,11 +30,8 @@ export class StoryRepository {
 			});
 		}
 
-		if (orderBy) {
-			queryBuilder.orderBy(`story.${orderBy}`, 'ASC');
-		}
-
-		buildCursorPaginationQuery(queryBuilder, 'story.storyId', startAfter, limit);
+		const orderByField = orderBy ? `story.${orderBy}` : 'story.storyId';
+		buildCursorPaginationQuery(queryBuilder, 'story.storyId', startAfter, limit, orderByField);
 
 		return queryBuilder.getMany();
 	};

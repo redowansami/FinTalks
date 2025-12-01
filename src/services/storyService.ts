@@ -28,7 +28,13 @@ export class StoryService {
 		const items = stories
 			.slice(0, queryParams.limit)
 			.map((story) => transformToDTO(StoryResponseDTO, story));
-		const nextCursor = hasMore ? items[items.length - 1].storyId : null;
+
+		let nextCursor: string | null = null;
+		if (hasMore) {
+			const lastItem = items[items.length - 1];
+			const orderByField = queryParams.orderBy || 'storyId';
+			nextCursor = String(lastItem[orderByField as keyof StoryResponseDTO]);
+		}
 
 		return { items, nextCursor };
 	};

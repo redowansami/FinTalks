@@ -7,13 +7,17 @@ export function buildCursorPaginationQuery<T extends ObjectLiteral>(
 	limit: number,
 	orderBy?: string,
 ): SelectQueryBuilder<T> {
-	if (orderBy) {
-		queryBuilder.orderBy(orderBy, 'ASC');
-	}
+	const primaryOrderField = orderBy || cursorField;
+
+	queryBuilder.orderBy(primaryOrderField, 'ASC');
 
 	if (cursorValue) {
-		queryBuilder.andWhere(`${cursorField} > :cursorValue`, { cursorValue });
+		queryBuilder.andWhere(`${primaryOrderField} > :cursorValue`, { cursorValue });
 	}
 
-	return queryBuilder.addOrderBy(cursorField, 'ASC').limit(limit);
+	if (orderBy && orderBy !== cursorField) {
+		queryBuilder.addOrderBy(cursorField, 'ASC');
+	}
+
+	return queryBuilder.limit(limit);
 }
