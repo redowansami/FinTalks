@@ -26,8 +26,13 @@ export const storyIdDTO = z.object({
 export const storyQueryDTO = z.object({
 	search: z.string().optional(),
 	orderBy: z.enum(StoryOrderByFields).optional(),
-	startAfter: z.string().min(1, 'Invalid cursor format').optional(),
-	limit: z.coerce.number().int().positive().max(100).default(10),
+	startAfter: z.string().optional(),
+	limit: z.coerce
+		.number()
+		.int()
+		.positive()
+		.max(LENTGH_CONSTRAINTS.MAX_LIMIT, VALIDATION_MESSAGES.MAX_LIMIT)
+		.default(LENTGH_CONSTRAINTS.DEFAULT_PAGINATION_LIMIT),
 });
 
 export type CreateStoryDTO = z.infer<typeof createStoryDTO>;

@@ -40,8 +40,13 @@ export const userIdDTO = z.object({
 export const userQueryDTO = z.object({
 	search: z.string().optional(),
 	orderBy: z.enum(UserOrderByFields).optional(),
-	startAfter: z.string().min(1, 'Invalid cursor format').optional(),
-	limit: z.coerce.number().int().positive().max(100).default(2),
+	startAfter: z.string().optional(),
+	limit: z.coerce
+		.number()
+		.int()
+		.positive()
+		.max(LENTGH_CONSTRAINTS.MAX_LIMIT, VALIDATION_MESSAGES.MAX_LIMIT)
+		.default(LENTGH_CONSTRAINTS.DEFAULT_PAGINATION_LIMIT),
 });
 
 export type CreateUserDTO = z.infer<typeof createUserDTO>;
