@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { UserRole } from '../entities/userEntity';
 import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validationConstants';
 import { UserOrderByFields } from '../constants/databaseConstants';
 import { Expose } from 'class-transformer';
@@ -18,11 +17,10 @@ export const createUserDTO = z
 			.max(LENTGH_CONSTRAINTS.NAME_MAX, VALIDATION_MESSAGES.NAME_MAX)
 			.trim(),
 		email: z.email(VALIDATION_MESSAGES.INVALID_EMAIL),
-		role: z.enum(UserRole).optional().default(UserRole.USER),
 	})
 	.strict();
 
-export const updateUserDTO = createUserDTO.partial();
+export const updateUserDTO = createUserDTO.partial().omit({ username: true, email: true });
 
 export class UserResponseDTO {
 	@Expose() userId: string;

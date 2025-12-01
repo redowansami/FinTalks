@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import { StoryService } from '../services/storyService';
-import { StoryQueryDTO, UpdateStoryDTO, storyQueryDTO } from '../dtos/storyDTO';
+import { StoryQueryDTO, UpdateStoryDTO } from '../dtos/storyDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
-import { parseWithSchema } from '../utils/mapper';
 
 export class StoryController {
 	constructor(private readonly storyService: StoryService) {}
@@ -17,29 +16,28 @@ export class StoryController {
 	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
-		const queryParams = parseWithSchema<StoryQueryDTO>(storyQueryDTO, req.query);
-
+		const queryParams = req.query as unknown as StoryQueryDTO;
 		const result = await this.storyService.getAllStoriesPaginated(queryParams);
-		res.json({ success: true, ...result });
+		res.status(HTTP_STATUS.OK).json({ success: true, ...result });
 	};
 
 	findOne = async (req: Request, res: Response): Promise<void> => {
 		const { storyId } = req.params;
 		const story = await this.storyService.getStoryById(storyId);
 
-		res.json({ success: true, story });
+		res.status(HTTP_STATUS.OK).json({ success: true, story });
 	};
 
 	patchUpdate = async (req: Request, res: Response): Promise<void> => {
 		const { storyId } = req.params;
 		await this.storyService.updateStory(storyId, req.body as UpdateStoryDTO);
 
-		res.json({ success: true, message: HTTP_MESSAGES.STORY_UPDATED });
+		res.status(HTTP_STATUS.OK).json({ success: true, message: HTTP_MESSAGES.STORY_UPDATED });
 	};
 
 	delete = async (req: Request, res: Response): Promise<void> => {
 		const { storyId } = req.params;
 		await this.storyService.deleteStory(storyId);
-		res.json({ success: true, message: HTTP_MESSAGES.STORY_DELETED });
+		res.sendStatus(HTTP_STATUS.NO_CONTENT);
 	};
 }

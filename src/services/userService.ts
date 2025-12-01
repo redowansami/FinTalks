@@ -4,6 +4,7 @@ import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { getPaginatedResults } from '../utils/paginationHelper';
+import { UserRole } from '../entities/userEntity';
 
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
@@ -19,7 +20,12 @@ export class UserService {
 			throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
 		}
 
-		const user = await this.userRepository.create(data);
+		const userData = {
+			...data,
+			role: UserRole.USER,
+		};
+
+		const user = await this.userRepository.create(userData);
 		return transformToDTO(UserResponseDTO, user);
 	};
 
@@ -44,21 +50,6 @@ export class UserService {
 
 	updateUser = async (id: string, updatedData: UpdateUserDTO): Promise<void> => {
 		await this.getUserById(id);
-
-		if (updatedData.username) {
-			const existingUsername = await this.userRepository.findByUsername(updatedData.username);
-			if (existingUsername && existingUsername.userId !== id) {
-				throw ErrorFactory.conflict(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS);
-			}
-		}
-
-		if (updatedData.email) {
-			const existingEmail = await this.userRepository.findByEmail(updatedData.email);
-			if (existingEmail && existingEmail.userId !== id) {
-				throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
-			}
-		}
-
 		await this.userRepository.update(id, updatedData);
 	};
 
