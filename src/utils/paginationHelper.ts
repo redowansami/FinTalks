@@ -1,0 +1,39 @@
+import { transformToDTO } from './mapper';
+
+interface PaginationResult<T> {
+	items: T[];
+	nextCursor: string | null;
+}
+
+export async function getPaginatedResults<
+	TEntity,
+	TResponse,
+	TQueryParams extends { startAfter?: string; limit: number; orderBy?: string },
+>(
+	queryParams: TQueryParams,
+	findPaginated: (params: TQueryParams & { limit: number }) => Promise<TEntity[]>,
+	ResponseDTO: new () => TResponse,
+	defaultOrderBy: string,
+): Promise<PaginationResult<TResponse>> {
+	const cursor = queryParams.startAfter;
+
+	const entities = await findPaginated({
+		...queryParams,
+		startAfter: cursor,
+		limit: queryParams.limit + 1,
+	});
+
+	const hasMore = entities.length > queryParams.limit;
+	const items = entities
+		.slice(0, queryParams.limit)
+		.map((entity) => transformToDTO(ResponseDTO, entity));
+
+	let nextCursor: string | null = null;
+	if (hasMore) {
+		const lastItem = items[items.length - 1];
+		const orderByField = queryParams.orderBy || defaultOrderBy;
+		nextCursor = String(lastItem[orderByField as keyof TResponse]);
+	}
+
+	return { items, nextCursor };
+}

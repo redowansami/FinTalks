@@ -3,6 +3,7 @@ import { ErrorFactory } from '../errors/errorFactory';
 import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../dtos/userDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
+import { getPaginatedResults } from '../utils/paginationHelper';
 
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
@@ -25,27 +26,12 @@ export class UserService {
 	getAllUsersPaginated = async (
 		queryParams: UserQueryDTO,
 	): Promise<{ items: UserResponseDTO[]; nextCursor: string | null }> => {
-		const cursor = queryParams.startAfter;
-
-		const users = await this.userRepository.findPaginated({
-			...queryParams,
-			startAfter: cursor,
-			limit: queryParams.limit + 1,
-		});
-
-		const hasMore = users.length > queryParams.limit;
-		const items = users
-			.slice(0, queryParams.limit)
-			.map((user) => transformToDTO(UserResponseDTO, user));
-
-		let nextCursor: string | null = null;
-		if (hasMore) {
-			const lastItem = items[items.length - 1];
-			const orderByField = queryParams.orderBy || 'userId';
-			nextCursor = String(lastItem[orderByField as keyof UserResponseDTO]);
-		}
-
-		return { items, nextCursor };
+		return getPaginatedResults(
+			queryParams,
+			(params) => this.userRepository.findPaginated(params),
+			UserResponseDTO,
+			'userId',
+		);
 	};
 
 	getUserById = async (id: string): Promise<UserResponseDTO> => {
