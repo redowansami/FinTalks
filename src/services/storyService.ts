@@ -16,7 +16,7 @@ export class StoryService {
 
 	findAllStories = async (
 		queryParams: StoryQueryDTO,
-	): Promise<{ items: StoryResponseDTO[]; nextCursor: string | null }> => {
+	): Promise<{ list: StoryResponseDTO[]; nextCursor: string | null }> => {
 		return getPaginatedResults(
 			queryParams,
 			(params) => this.storyRepository.findAll(params),

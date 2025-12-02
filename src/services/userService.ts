@@ -25,7 +25,7 @@ export class UserService {
 
 	findAllUsers = async (
 		queryParams: UserQueryDTO,
-	): Promise<{ items: UserResponseDTO[]; page: number; nextPage: number | null }> => {
+	): Promise<{ list: UserResponseDTO[]; page: number; nextPage: number | null }> => {
 		return getOffsetPaginatedResults(
 			queryParams,
 			(params: UserQueryDTO) => this.userRepository.findAll(params),

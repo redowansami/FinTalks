@@ -1,7 +1,7 @@
 import { transformToDTO } from './mapper';
 
 interface PaginationResult<T> {
-	items: T[];
+	list: T[];
 	nextCursor: string | null;
 }
 
@@ -24,16 +24,16 @@ export async function getPaginatedResults<
 	});
 
 	const hasMore = entities.length > queryParams.limit;
-	const items = entities
+	const list = entities
 		.slice(0, queryParams.limit)
 		.map((entity) => transformToDTO(ResponseDTO, entity));
 
 	let nextCursor: string | null = null;
 	if (hasMore) {
-		const lastItem = items[items.length - 1];
+		const lastItem = list[list.length - 1];
 		const orderByField = queryParams.orderBy || defaultOrderBy;
 		nextCursor = String(lastItem[orderByField as keyof TResponse]);
 	}
 
-	return { items, nextCursor };
+	return { list, nextCursor };
 }

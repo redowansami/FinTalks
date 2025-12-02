@@ -1,7 +1,7 @@
 import { transformToDTO } from './mapper';
 
 interface OffsetPaginationResult<T> {
-	items: T[];
+	list: T[];
 	page: number;
 	nextPage: number | null;
 	total?: number;
@@ -22,12 +22,12 @@ export async function getOffsetPaginatedResults<
 	});
 
 	const hasNextPage = entities.length > Number(queryParams.limit);
-	const items = entities
+	const list = entities
 		.slice(0, Number(queryParams.limit))
 		.map((entity) => transformToDTO(ResponseDTO, entity));
 
 	return {
-		items,
+		list,
 		page: queryParams.page,
 		nextPage: hasNextPage ? Number(queryParams.page) + 1 : null,
 	};
