@@ -30,9 +30,13 @@ export class UserController {
 
 	update = async (req: Request, res: Response): Promise<void> => {
 		const userId = req.params.userId;
-		await this.userService.updateUser(userId, req.body as UpdateUserDTO);
+		const user = await this.userService.updateUser(userId, req.body as UpdateUserDTO);
 
-		res.status(HTTP_STATUS.OK).json({ success: true, message: HTTP_MESSAGES.USER_UPDATED });
+		res.status(HTTP_STATUS.OK).json({
+			success: true,
+			message: HTTP_MESSAGES.USER_UPDATED,
+			user,
+		});
 	};
 
 	delete = async (req: Request, res: Response): Promise<void> => {
@@ -41,3 +45,4 @@ export class UserController {
 		res.sendStatus(HTTP_STATUS.NO_CONTENT);
 	};
 }
+//

@@ -33,9 +33,10 @@ export class StoryService {
 		return transformToDTO(StoryResponseDTO, story);
 	};
 
-	updateStory = async (id: string, updatedData: UpdateStoryDTO): Promise<void> => {
+	updateStory = async (id: string, updatedData: UpdateStoryDTO): Promise<StoryResponseDTO> => {
 		await this.getStoryById(id);
-		await this.storyRepository.update(id, updatedData);
+		const story = await this.storyRepository.update(id, updatedData);
+		return transformToDTO(StoryResponseDTO, story);
 	};
 
 	deleteStory = async (id: string): Promise<void> => {

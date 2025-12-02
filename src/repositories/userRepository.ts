@@ -47,9 +47,10 @@ export class UserRepository {
 		return this.repository.findOne({ where: { email } });
 	};
 
-	update = async (id: string, user: Partial<User>): Promise<boolean> => {
+	update = async (id: string, user: Partial<User>): Promise<User | null | undefined> => {
 		const result = await this.repository.update(id, user);
-		return result.affected === 1;
+		if (result.affected === 1) return this.findById(id);
+		else return null;
 	};
 
 	softDelete = async (id: string): Promise<boolean> => {

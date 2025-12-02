@@ -30,9 +30,13 @@ export class StoryController {
 
 	update = async (req: Request, res: Response): Promise<void> => {
 		const storyId = req.params.storyId;
-		await this.storyService.updateStory(storyId, req.body as UpdateStoryDTO);
+		const story = await this.storyService.updateStory(storyId, req.body as UpdateStoryDTO);
 
-		res.status(HTTP_STATUS.OK).json({ success: true, message: HTTP_MESSAGES.STORY_UPDATED });
+		res.status(HTTP_STATUS.OK).json({
+			success: true,
+			message: HTTP_MESSAGES.STORY_UPDATED,
+			story,
+		});
 	};
 
 	delete = async (req: Request, res: Response): Promise<void> => {

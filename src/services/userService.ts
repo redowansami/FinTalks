@@ -41,9 +41,10 @@ export class UserService {
 		return transformToDTO(UserResponseDTO, user);
 	};
 
-	updateUser = async (id: string, updatedData: UpdateUserDTO): Promise<void> => {
+	updateUser = async (id: string, updatedData: UpdateUserDTO): Promise<UserResponseDTO> => {
 		await this.getUserById(id);
-		await this.userRepository.update(id, updatedData);
+		const user = await this.userRepository.update(id, updatedData);
+		return transformToDTO(UserResponseDTO, user);
 	};
 
 	deleteUser = async (id: string): Promise<void> => {

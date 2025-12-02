@@ -40,9 +40,10 @@ export class StoryRepository {
 		return this.repository.findOne({ where: { storyId: id } });
 	};
 
-	update = async (id: string, story: Partial<Story>): Promise<boolean> => {
+	update = async (id: string, story: Partial<Story>): Promise<Story | null | undefined> => {
 		const result = await this.repository.update(id, story);
-		return result.affected === 1;
+		if (result.affected === 1) return this.findById(id);
+		else return null;
 	};
 
 	softDelete = async (id: string): Promise<boolean> => {
