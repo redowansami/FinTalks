@@ -4,7 +4,6 @@ import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { getOffsetPaginatedResults } from '../utils/offsetPaginationHelper';
-import { UserRole } from '../entities/userEntity';
 
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
@@ -20,12 +19,7 @@ export class UserService {
 			throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
 		}
 
-		const userData = {
-			...data,
-			role: UserRole.USER,
-		};
-
-		const user = await this.userRepository.create(userData);
+		const user = await this.userRepository.create(data);
 		return transformToDTO(UserResponseDTO, user);
 	};
 
