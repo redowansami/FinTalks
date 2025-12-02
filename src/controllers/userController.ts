@@ -47,4 +47,3 @@ export class UserController {
 		res.sendStatus(HTTP_STATUS.NO_CONTENT);
 	};
 }
-//
