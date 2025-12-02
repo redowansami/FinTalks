@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { StoryService } from '../services/storyService';
 import { StoryQueryDTO, UpdateStoryDTO } from '../dtos/storyDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
+import { autoInjectable } from 'tsyringe';
 
+@autoInjectable()
 export class StoryController {
 	constructor(private readonly storyService: StoryService) {}
 

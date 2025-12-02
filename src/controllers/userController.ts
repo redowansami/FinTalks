@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { UpdateUserDTO, UserQueryDTO } from '../dtos/userDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
+import { autoInjectable } from 'tsyringe';
 
+@autoInjectable()
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 

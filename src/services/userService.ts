@@ -4,7 +4,9 @@ import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { getOffsetPaginatedResults } from '../utils/offsetPaginationHelper';
+import { autoInjectable } from 'tsyringe';
 
+@autoInjectable()
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
 

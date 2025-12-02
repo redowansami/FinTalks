@@ -1,9 +1,11 @@
+import { container } from 'tsyringe';
+import { UserController } from '../controllers/userController';
 import { Router } from 'express';
-import { userController } from '../containers/userContainer';
 import { validateRequest } from '../middleware/validationMiddleware';
 import { createUserSchema, updateUserSchema, userIdSchema, userQuerySchema } from '../dtos/userDTO';
 
 const router = Router();
+const userController = container.resolve(UserController);
 
 router
 	.post('/', validateRequest({ body: createUserSchema }), userController.create)
