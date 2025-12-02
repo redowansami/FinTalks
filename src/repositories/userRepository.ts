@@ -49,6 +49,7 @@ export class UserRepository {
 
 	update = async (id: string, user: Partial<User>): Promise<boolean> => {
 		const result = await this.repository.update(id, user);
+		console.log(result);
 		return result.affected === 1;
 	};
 

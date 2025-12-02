@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodType } from 'zod';
 import { ErrorFactory } from '../errors/errorFactory';
-import { formatZodError } from '../errors/errorUtils';
+import { formatZodError } from '../utils/errorUtils';
 
 export const validateRequest = (schemas: { body?: ZodType; params?: ZodType; query?: ZodType }) => {
 	return async (req: Request, res: Response, next: NextFunction): Promise<void> => {

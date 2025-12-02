@@ -16,27 +16,27 @@ export class StoryController {
 	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
-		const queryParams = req.query as unknown as StoryQueryDTO;
-		const result = await this.storyService.getAllStoriesPaginated(queryParams);
+		const query = req.query as unknown as StoryQueryDTO;
+		const result = await this.storyService.getAllStoriesPaginated(query);
 		res.status(HTTP_STATUS.OK).json({ success: true, ...result });
 	};
 
 	findOne = async (req: Request, res: Response): Promise<void> => {
-		const { storyId } = req.params;
+		const storyId = req.params.storyId;
 		const story = await this.storyService.getStoryById(storyId);
 
 		res.status(HTTP_STATUS.OK).json({ success: true, story });
 	};
 
 	patchUpdate = async (req: Request, res: Response): Promise<void> => {
-		const { storyId } = req.params;
+		const storyId = req.params.storyId;
 		await this.storyService.updateStory(storyId, req.body as UpdateStoryDTO);
 
 		res.status(HTTP_STATUS.OK).json({ success: true, message: HTTP_MESSAGES.STORY_UPDATED });
 	};
 
 	delete = async (req: Request, res: Response): Promise<void> => {
-		const { storyId } = req.params;
+		const storyId = req.params.storyId;
 		await this.storyService.deleteStory(storyId);
 		res.sendStatus(HTTP_STATUS.NO_CONTENT);
 	};

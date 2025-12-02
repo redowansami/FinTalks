@@ -16,27 +16,27 @@ export class UserController {
 	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
-		const queryParams = req.query as unknown as UserQueryDTO;
-		const result = await this.userService.getAllUsersPaginated(queryParams);
+		const query = req.query as unknown as UserQueryDTO;
+		const result = await this.userService.getAllUsersPaginated(query);
 		res.status(HTTP_STATUS.OK).json({ success: true, ...result });
 	};
 
 	findOne = async (req: Request, res: Response): Promise<void> => {
-		const { userId } = req.params;
+		const userId = req.params.userId;
 		const user = await this.userService.getUserById(userId);
 
 		res.status(HTTP_STATUS.OK).json({ success: true, user });
 	};
 
 	patchUpdate = async (req: Request, res: Response): Promise<void> => {
-		const { userId } = req.params;
+		const userId = req.params.userId;
 		await this.userService.updateUser(userId, req.body as UpdateUserDTO);
 
 		res.status(HTTP_STATUS.OK).json({ success: true, message: HTTP_MESSAGES.USER_UPDATED });
 	};
 
 	delete = async (req: Request, res: Response): Promise<void> => {
-		const { userId } = req.params;
+		const userId = req.params.userId;
 		await this.userService.deleteUser(userId);
 		res.sendStatus(HTTP_STATUS.NO_CONTENT);
 	};
