@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../config/dataSource';
 import { Story } from '../entities/storyEntity';
 import { CreateStoryDTO, StoryQueryDTO } from '../dtos/storyDTO';
-import { buildCursorPaginationQuery } from '../utils/paginationQuery';
+import { buildCursorPaginationQuery } from '../utils/cursorPaginationQuery';
 import { applyFuzzySearch } from '../utils/fuzzySearch';
 
 export class StoryRepository {

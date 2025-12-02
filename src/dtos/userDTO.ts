@@ -38,7 +38,7 @@ export const userIdDTO = z.object({
 export const userQueryDTO = z.object({
 	search: z.string().optional(),
 	orderBy: z.enum(UserOrderByFields).optional(),
-	startAfter: z.string().optional(),
+	page: z.coerce.number().int().positive().default(1),
 	limit: z.coerce
 		.number()
 		.int()

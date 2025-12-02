@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../config/dataSource';
 import { User } from '../entities/userEntity';
 import { CreateUserDTO, UserQueryDTO } from 'dtos/userDTO';
-import { buildCursorPaginationQuery } from '../utils/paginationQuery';
+import { buildOffsetPaginationQuery } from '../utils/offsetPaginationQuery';
 import { applyFuzzySearch } from '../utils/fuzzySearch';
 
 export class UserRepository {
@@ -18,7 +18,7 @@ export class UserRepository {
 	};
 
 	findPaginated = async (queryParams: UserQueryDTO): Promise<User[]> => {
-		const { search, orderBy, startAfter, limit } = queryParams;
+		const { search, orderBy, page, limit } = queryParams;
 		const queryBuilder = this.repository.createQueryBuilder('user');
 
 		if (search && search.trim()) {
@@ -30,7 +30,7 @@ export class UserRepository {
 		}
 
 		const orderByField = orderBy ? `user.${orderBy}` : 'user.userId';
-		buildCursorPaginationQuery(queryBuilder, 'user.userId', startAfter, limit, orderByField);
+		buildOffsetPaginationQuery(queryBuilder, page, limit, orderBy, orderByField);
 
 		return queryBuilder.getMany();
 	};
@@ -49,7 +49,6 @@ export class UserRepository {
 
 	update = async (id: string, user: Partial<User>): Promise<boolean> => {
 		const result = await this.repository.update(id, user);
-		console.log(result);
 		return result.affected === 1;
 	};
 

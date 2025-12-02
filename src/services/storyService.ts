@@ -4,7 +4,7 @@ import { ErrorFactory } from '../errors/errorFactory';
 import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO, StoryQueryDTO } from '../dtos/storyDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
-import { getPaginatedResults } from '../utils/paginationHelper';
+import { getPaginatedResults } from '../utils/cursorPaginationHelper';
 
 export class StoryService {
 	constructor(private readonly storyRepository: StoryRepository) {}

@@ -3,7 +3,7 @@ import { ErrorFactory } from '../errors/errorFactory';
 import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../dtos/userDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
-import { getPaginatedResults } from '../utils/paginationHelper';
+import { getOffsetPaginatedResults } from '../utils/offsetPaginationHelper';
 import { UserRole } from '../entities/userEntity';
 
 export class UserService {
@@ -31,12 +31,11 @@ export class UserService {
 
 	getAllUsersPaginated = async (
 		queryParams: UserQueryDTO,
-	): Promise<{ items: UserResponseDTO[]; nextCursor: string | null }> => {
-		return getPaginatedResults(
+	): Promise<{ items: UserResponseDTO[]; page: number; nextPage: number | null }> => {
+		return getOffsetPaginatedResults(
 			queryParams,
-			(params) => this.userRepository.findPaginated(params),
+			(params: UserQueryDTO) => this.userRepository.findPaginated(params),
 			UserResponseDTO,
-			'userId',
 		);
 	};
 
