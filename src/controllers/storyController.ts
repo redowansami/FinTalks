@@ -17,7 +17,7 @@ export class StoryController {
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
 		const query = req.query as unknown as StoryQueryDTO;
-		const result = await this.storyService.getAllStoriesPaginated(query);
+		const result = await this.storyService.findAllStories(query);
 		res.status(HTTP_STATUS.OK).json({ success: true, ...result });
 	};
 
@@ -28,7 +28,7 @@ export class StoryController {
 		res.status(HTTP_STATUS.OK).json({ success: true, story });
 	};
 
-	patchUpdate = async (req: Request, res: Response): Promise<void> => {
+	update = async (req: Request, res: Response): Promise<void> => {
 		const storyId = req.params.storyId;
 		await this.storyService.updateStory(storyId, req.body as UpdateStoryDTO);
 

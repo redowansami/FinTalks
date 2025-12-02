@@ -23,12 +23,12 @@ export class UserService {
 		return transformToDTO(UserResponseDTO, user);
 	};
 
-	getAllUsersPaginated = async (
+	findAllUsers = async (
 		queryParams: UserQueryDTO,
 	): Promise<{ items: UserResponseDTO[]; page: number; nextPage: number | null }> => {
 		return getOffsetPaginatedResults(
 			queryParams,
-			(params: UserQueryDTO) => this.userRepository.findPaginated(params),
+			(params: UserQueryDTO) => this.userRepository.findAll(params),
 			UserResponseDTO,
 		);
 	};

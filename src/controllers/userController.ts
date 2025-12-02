@@ -17,7 +17,7 @@ export class UserController {
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
 		const query = req.query as unknown as UserQueryDTO;
-		const result = await this.userService.getAllUsersPaginated(query);
+		const result = await this.userService.findAllUsers(query);
 		res.status(HTTP_STATUS.OK).json({ success: true, ...result });
 	};
 
@@ -28,7 +28,7 @@ export class UserController {
 		res.status(HTTP_STATUS.OK).json({ success: true, user });
 	};
 
-	patchUpdate = async (req: Request, res: Response): Promise<void> => {
+	update = async (req: Request, res: Response): Promise<void> => {
 		const userId = req.params.userId;
 		await this.userService.updateUser(userId, req.body as UpdateUserDTO);
 

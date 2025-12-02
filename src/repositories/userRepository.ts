@@ -17,7 +17,7 @@ export class UserRepository {
 		return this.repository.save(user);
 	};
 
-	findPaginated = async (queryParams: UserQueryDTO): Promise<User[]> => {
+	findAll = async (queryParams: UserQueryDTO): Promise<User[]> => {
 		const { search, orderBy, page, limit } = queryParams;
 		const queryBuilder = this.repository.createQueryBuilder('user');
 

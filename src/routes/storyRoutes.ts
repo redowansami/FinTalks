@@ -17,7 +17,7 @@ router
 	.patch(
 		'/:storyId',
 		validateRequest({ params: storyIdSchema, body: updateStorySchema }),
-		storyController.patchUpdate,
+		storyController.update,
 	)
 	.delete('/:storyId', validateRequest({ params: storyIdSchema }), storyController.delete);
 

@@ -17,7 +17,7 @@ export class StoryRepository {
 		return this.repository.save(story);
 	};
 
-	findPaginated = async (queryParams: StoryQueryDTO): Promise<Story[]> => {
+	findAll = async (queryParams: StoryQueryDTO): Promise<Story[]> => {
 		const { search, orderBy, startAfter, limit } = queryParams;
 		const queryBuilder = this.repository
 			.createQueryBuilder('story')

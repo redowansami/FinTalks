@@ -14,12 +14,12 @@ export class StoryService {
 		return transformToDTO(StoryResponseDTO, story);
 	};
 
-	getAllStoriesPaginated = async (
+	findAllStories = async (
 		queryParams: StoryQueryDTO,
 	): Promise<{ items: StoryResponseDTO[]; nextCursor: string | null }> => {
 		return getPaginatedResults(
 			queryParams,
-			(params) => this.storyRepository.findPaginated(params),
+			(params) => this.storyRepository.findAll(params),
 			StoryResponseDTO,
 			'storyId',
 		);

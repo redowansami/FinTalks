@@ -12,7 +12,7 @@ router
 	.patch(
 		'/:userId',
 		validateRequest({ params: userIdSchema, body: updateUserSchema }),
-		userController.patchUpdate,
+		userController.update,
 	)
 	.delete('/:userId', validateRequest({ params: userIdSchema }), userController.delete);
 
