@@ -13,13 +13,10 @@ export async function getOffsetPaginatedResults<
 	TQueryParams extends { page: number; limit: number; orderBy?: string },
 >(
 	queryParams: TQueryParams,
-	findPaginated: (params: TQueryParams & { limit: number }) => Promise<TEntity[]>,
+	findPaginated: (params: TQueryParams) => Promise<TEntity[]>,
 	ResponseDTO: new () => TResponse,
 ): Promise<OffsetPaginationResult<TResponse>> {
-	const entities = await findPaginated({
-		...queryParams,
-		limit: Number(queryParams.limit) + 1,
-	});
+	const entities = await findPaginated(queryParams);
 
 	const hasNextPage = entities.length > Number(queryParams.limit);
 	const list = entities
