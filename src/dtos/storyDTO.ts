@@ -3,7 +3,7 @@ import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validation
 import { StoryOrderByFields } from '../constants/databaseConstants';
 import { Expose } from 'class-transformer';
 
-export const createStoryDTO = z
+export const createStorySchema = z
 	.object({
 		userId: z.uuid(VALIDATION_MESSAGES.INVALID_USER_ID),
 		title: z
@@ -17,13 +17,13 @@ export const createStoryDTO = z
 	})
 	.strict();
 
-export const updateStoryDTO = createStoryDTO.partial().omit({ userId: true }).strict();
+export const updateStorySchema = createStorySchema.partial().omit({ userId: true }).strict();
 
-export const storyIdDTO = z.object({
+export const storyIdSchema = z.object({
 	storyId: z.uuid(VALIDATION_MESSAGES.INVALID_STORY_ID),
 });
 
-export const storyQueryDTO = z.object({
+export const storyQuerySchema = z.object({
 	search: z.string().optional(),
 	orderBy: z.enum(StoryOrderByFields).optional(),
 	startAfter: z.string().optional(),
@@ -35,10 +35,10 @@ export const storyQueryDTO = z.object({
 		.default(LENTGH_CONSTRAINTS.DEFAULT_PAGINATION_LIMIT),
 });
 
-export type CreateStoryDTO = z.infer<typeof createStoryDTO>;
-export type UpdateStoryDTO = z.infer<typeof updateStoryDTO>;
-export type StoryIdDTO = z.infer<typeof storyIdDTO>;
-export type StoryQueryDTO = z.infer<typeof storyQueryDTO>;
+export type CreateStoryDTO = z.infer<typeof createStorySchema>;
+export type UpdateStoryDTO = z.infer<typeof updateStorySchema>;
+export type StoryIdDTO = z.infer<typeof storyIdSchema>;
+export type StoryQueryDTO = z.infer<typeof storyQuerySchema>;
 
 export class StoryResponseDTO {
 	@Expose() storyId: string;

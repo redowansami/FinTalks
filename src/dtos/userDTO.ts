@@ -3,7 +3,7 @@ import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validation
 import { UserOrderByFields } from '../constants/databaseConstants';
 import { Expose } from 'class-transformer';
 
-export const createUserDTO = z
+export const createUserSchema = z
 	.object({
 		username: z
 			.string()
@@ -23,22 +23,13 @@ export const createUserDTO = z
 	})
 	.strict();
 
-export const updateUserDTO = createUserDTO.partial().omit({ username: true, email: true });
+export const updateUserSchema = createUserSchema.partial().omit({ username: true, email: true });
 
-export class UserResponseDTO {
-	@Expose() userId: string;
-	@Expose() username: string;
-	@Expose() name: string;
-	@Expose() email: string;
-	@Expose() joinDate: Date;
-	@Expose() role: string;
-}
-
-export const userIdDTO = z.object({
+export const userIdSchema = z.object({
 	userId: z.uuid('Invalid user ID format'),
 });
 
-export const userQueryDTO = z.object({
+export const userQuerySchema = z.object({
 	search: z.string().optional(),
 	orderBy: z.enum(UserOrderByFields).optional(),
 	page: z.coerce.number().int().positive().default(1),
@@ -50,7 +41,16 @@ export const userQueryDTO = z.object({
 		.default(LENTGH_CONSTRAINTS.DEFAULT_PAGINATION_LIMIT),
 });
 
-export type CreateUserDTO = z.infer<typeof createUserDTO>;
-export type UpdateUserDTO = z.infer<typeof updateUserDTO>;
-export type UserIdDTO = z.infer<typeof userIdDTO>;
-export type UserQueryDTO = z.infer<typeof userQueryDTO>;
+export type CreateUserDTO = z.infer<typeof createUserSchema>;
+export type UpdateUserDTO = z.infer<typeof updateUserSchema>;
+export type UserIdDTO = z.infer<typeof userIdSchema>;
+export type UserQueryDTO = z.infer<typeof userQuerySchema>;
+
+export class UserResponseDTO {
+	@Expose() userId: string;
+	@Expose() username: string;
+	@Expose() name: string;
+	@Expose() email: string;
+	@Expose() joinDate: Date;
+	@Expose() role: string;
+}
