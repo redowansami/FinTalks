@@ -23,7 +23,7 @@ export class User {
 	@Column({ type: 'varchar', length: LENTGH_CONSTRAINTS.NAME_MAX })
 	name: string;
 
-	@Column({ type: 'varchar', unique: true })
+	@Column({ type: 'varchar', unique: true, length: LENTGH_CONSTRAINTS.EMAIL_MAX })
 	email: string;
 
 	@CreateDateColumn({ type: 'timestamp' })
