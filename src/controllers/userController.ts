@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
-import { UpdateUserDTO } from '../dtos/userDTO';
+import { UpdateUserDTO, UserQueryDTO } from '../dtos/userDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
 
 export class UserController {
@@ -16,27 +16,28 @@ export class UserController {
 	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
-		const users = await this.userService.getAllUsers();
-		res.json({ success: true, users });
+		const query = req.query as unknown as UserQueryDTO;
+		const result = await this.userService.getAllUsersPaginated(query);
+		res.status(HTTP_STATUS.OK).json({ success: true, ...result });
 	};
 
 	findOne = async (req: Request, res: Response): Promise<void> => {
-		const { userId } = req.params;
+		const userId = req.params.userId;
 		const user = await this.userService.getUserById(userId);
 
-		res.json({ success: true, user });
+		res.status(HTTP_STATUS.OK).json({ success: true, user });
 	};
 
 	patchUpdate = async (req: Request, res: Response): Promise<void> => {
-		const { userId } = req.params;
+		const userId = req.params.userId;
 		await this.userService.updateUser(userId, req.body as UpdateUserDTO);
 
-		res.json({ success: true, message: HTTP_MESSAGES.USER_UPDATED });
+		res.status(HTTP_STATUS.OK).json({ success: true, message: HTTP_MESSAGES.USER_UPDATED });
 	};
 
 	delete = async (req: Request, res: Response): Promise<void> => {
-		const { userId } = req.params;
+		const userId = req.params.userId;
 		await this.userService.deleteUser(userId);
-		res.json({ success: true, message: HTTP_MESSAGES.USER_DELETED });
+		res.sendStatus(HTTP_STATUS.NO_CONTENT);
 	};
 }

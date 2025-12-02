@@ -1,4 +1,4 @@
-import { ValidationErrorDetail, DatabaseError } from './customErrors';
+import { ValidationErrorDetail, DatabaseError } from '../errors/customErrors';
 import { DATABASE_ERROR_CODES, DATABASE_ERROR_MESSAGES } from '../constants/databaseConstants';
 import { ZodError } from 'zod';
 

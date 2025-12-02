@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validationConstants';
+import { StoryOrderByFields } from '../constants/databaseConstants';
 import { Expose } from 'class-transformer';
 
 export const createStoryDTO = z
@@ -22,9 +23,22 @@ export const storyIdDTO = z.object({
 	storyId: z.uuid(VALIDATION_MESSAGES.INVALID_STORY_ID),
 });
 
+export const storyQueryDTO = z.object({
+	search: z.string().optional(),
+	orderBy: z.enum(StoryOrderByFields).optional(),
+	startAfter: z.string().optional(),
+	limit: z.coerce
+		.number()
+		.int()
+		.positive()
+		.max(LENTGH_CONSTRAINTS.MAX_LIMIT, VALIDATION_MESSAGES.MAX_LIMIT)
+		.default(LENTGH_CONSTRAINTS.DEFAULT_PAGINATION_LIMIT),
+});
+
 export type CreateStoryDTO = z.infer<typeof createStoryDTO>;
 export type UpdateStoryDTO = z.infer<typeof updateStoryDTO>;
 export type StoryIdDTO = z.infer<typeof storyIdDTO>;
+export type StoryQueryDTO = z.infer<typeof storyQueryDTO>;
 
 export class StoryResponseDTO {
 	@Expose() storyId: string;

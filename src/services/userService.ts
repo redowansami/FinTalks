@@ -1,8 +1,10 @@
 import { UserRepository } from '../repositories/userRepository';
 import { ErrorFactory } from '../errors/errorFactory';
-import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '../dtos/userDTO';
+import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../dtos/userDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
+import { getOffsetPaginatedResults } from '../utils/offsetPaginationHelper';
+import { UserRole } from '../entities/userEntity';
 
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
@@ -18,13 +20,23 @@ export class UserService {
 			throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
 		}
 
-		const user = await this.userRepository.create(data);
+		const userData = {
+			...data,
+			role: UserRole.USER,
+		};
+
+		const user = await this.userRepository.create(userData);
 		return transformToDTO(UserResponseDTO, user);
 	};
 
-	getAllUsers = async (): Promise<UserResponseDTO[]> => {
-		const users = await this.userRepository.findAll();
-		return users.map((user) => transformToDTO(UserResponseDTO, user));
+	getAllUsersPaginated = async (
+		queryParams: UserQueryDTO,
+	): Promise<{ items: UserResponseDTO[]; page: number; nextPage: number | null }> => {
+		return getOffsetPaginatedResults(
+			queryParams,
+			(params: UserQueryDTO) => this.userRepository.findPaginated(params),
+			UserResponseDTO,
+		);
 	};
 
 	getUserById = async (id: string): Promise<UserResponseDTO> => {
@@ -37,21 +49,6 @@ export class UserService {
 
 	updateUser = async (id: string, updatedData: UpdateUserDTO): Promise<void> => {
 		await this.getUserById(id);
-
-		if (updatedData.username) {
-			const existingUsername = await this.userRepository.findByUsername(updatedData.username);
-			if (existingUsername && existingUsername.userId !== id) {
-				throw ErrorFactory.conflict(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS);
-			}
-		}
-
-		if (updatedData.email) {
-			const existingEmail = await this.userRepository.findByEmail(updatedData.email);
-			if (existingEmail && existingEmail.userId !== id) {
-				throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
-			}
-		}
-
 		await this.userRepository.update(id, updatedData);
 	};
 

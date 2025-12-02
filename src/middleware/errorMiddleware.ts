@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { ValidationError } from '../errors/customErrors';
 import { AppError } from '../errors/appError';
-import { handleDatabaseError } from '../errors/errorUtils';
+import { handleDatabaseError } from '../utils/errorUtils';
 import { HTTP_MESSAGES, HTTP_STATUS } from '../constants/httpConstants';
 import { env } from '../utils/envParser';
 
 interface ErrorResponsePayload {
 	success: boolean;
-	statusCode: number;
 	message: string;
 	errors?: Record<string, unknown>;
 	stack?: string;
@@ -30,7 +29,6 @@ export const errorHandler = (
 	if (err instanceof AppError) {
 		const response: ErrorResponsePayload = {
 			success: false,
-			statusCode: err.statusCode,
 			message: err.message,
 		};
 
@@ -49,7 +47,6 @@ export const errorHandler = (
 		const dbError = handleDatabaseError(err);
 		const response: ErrorResponsePayload = {
 			success: false,
-			statusCode: dbError.statusCode,
 			message: dbError.message,
 		};
 
@@ -63,7 +60,6 @@ export const errorHandler = (
 
 	const response: ErrorResponsePayload = {
 		success: false,
-		statusCode: HTTP_STATUS.INTERNAL_ERROR,
 		message: HTTP_MESSAGES.INTERNAL_ERROR,
 	};
 
@@ -78,7 +74,6 @@ export const errorHandler = (
 export const routeNotFoundHandler = (_req: Request, res: Response): Response => {
 	const response: ErrorResponsePayload = {
 		success: false,
-		statusCode: HTTP_STATUS.NOT_FOUND,
 		message: HTTP_MESSAGES.ROUTE_NOT_FOUND,
 	};
 

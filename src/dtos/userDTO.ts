@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { UserRole } from '../entities/userEntity';
 import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validationConstants';
+import { UserOrderByFields } from '../constants/databaseConstants';
 import { Expose } from 'class-transformer';
 
 export const createUserDTO = z
@@ -17,11 +17,10 @@ export const createUserDTO = z
 			.max(LENTGH_CONSTRAINTS.NAME_MAX, VALIDATION_MESSAGES.NAME_MAX)
 			.trim(),
 		email: z.email(VALIDATION_MESSAGES.INVALID_EMAIL),
-		role: z.enum(UserRole).optional().default(UserRole.USER),
 	})
 	.strict();
 
-export const updateUserDTO = createUserDTO.partial();
+export const updateUserDTO = createUserDTO.partial().omit({ username: true, email: true });
 
 export class UserResponseDTO {
 	@Expose() userId: string;
@@ -36,6 +35,19 @@ export const userIdDTO = z.object({
 	userId: z.uuid('Invalid user ID format'),
 });
 
+export const userQueryDTO = z.object({
+	search: z.string().optional(),
+	orderBy: z.enum(UserOrderByFields).optional(),
+	page: z.coerce.number().int().positive().default(1),
+	limit: z.coerce
+		.number()
+		.int()
+		.positive()
+		.max(LENTGH_CONSTRAINTS.MAX_LIMIT, VALIDATION_MESSAGES.MAX_LIMIT)
+		.default(LENTGH_CONSTRAINTS.DEFAULT_PAGINATION_LIMIT),
+});
+
 export type CreateUserDTO = z.infer<typeof createUserDTO>;
 export type UpdateUserDTO = z.infer<typeof updateUserDTO>;
 export type UserIdDTO = z.infer<typeof userIdDTO>;
+export type UserQueryDTO = z.infer<typeof userQueryDTO>;

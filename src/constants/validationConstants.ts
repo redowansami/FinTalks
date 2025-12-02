@@ -9,6 +9,8 @@ export const LENTGH_CONSTRAINTS = {
 	TITLE_MAX: 100,
 	BODY_MIN: 10,
 	BODY_MAX: 5000,
+	MAX_LIMIT: 100,
+	DEFAULT_PAGINATION_LIMIT: 3,
 };
 
 export const VALIDATION_MESSAGES = {
@@ -24,4 +26,5 @@ export const VALIDATION_MESSAGES = {
 	TITLE_MAX: 'Title must be at most 100 characters',
 	BODY_MIN: 'Body should be at least 10 characters long',
 	BODY_MAX: 'Body must be at most 5000 characters',
+	MAX_LIMIT: 'Limit must be at most 100',
 };

@@ -1,7 +1,9 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../config/dataSource';
 import { User } from '../entities/userEntity';
-import { CreateUserDTO } from 'dtos/userDTO';
+import { CreateUserDTO, UserQueryDTO } from 'dtos/userDTO';
+import { buildOffsetPaginationQuery } from '../utils/offsetPaginationQuery';
+import { applyFuzzySearch } from '../utils/fuzzySearch';
 
 export class UserRepository {
 	private repository: Repository<User>;
@@ -15,8 +17,22 @@ export class UserRepository {
 		return this.repository.save(user);
 	};
 
-	findAll = async (): Promise<User[]> => {
-		return this.repository.find();
+	findPaginated = async (queryParams: UserQueryDTO): Promise<User[]> => {
+		const { search, orderBy, page, limit } = queryParams;
+		const queryBuilder = this.repository.createQueryBuilder('user');
+
+		if (search && search.trim()) {
+			applyFuzzySearch(queryBuilder, {
+				'user.name': search,
+				'user.username': search,
+				'user.email': search,
+			});
+		}
+
+		const orderByField = orderBy ? `user.${orderBy}` : 'user.userId';
+		buildOffsetPaginationQuery(queryBuilder, page, limit, orderBy, orderByField);
+
+		return queryBuilder.getMany();
 	};
 
 	findById = async (id: string): Promise<User | null> => {

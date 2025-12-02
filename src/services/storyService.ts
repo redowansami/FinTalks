@@ -1,9 +1,10 @@
 import { Story } from '../entities/storyEntity';
 import { StoryRepository } from '../repositories/storyRepository';
 import { ErrorFactory } from '../errors/errorFactory';
-import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO } from '../dtos/storyDTO';
+import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO, StoryQueryDTO } from '../dtos/storyDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
+import { getPaginatedResults } from '../utils/cursorPaginationHelper';
 
 export class StoryService {
 	constructor(private readonly storyRepository: StoryRepository) {}
@@ -13,9 +14,15 @@ export class StoryService {
 		return transformToDTO(StoryResponseDTO, story);
 	};
 
-	getAllStories = async (): Promise<StoryResponseDTO[]> => {
-		const stories: Story[] = await this.storyRepository.findAll();
-		return stories.map((story) => transformToDTO(StoryResponseDTO, story));
+	getAllStoriesPaginated = async (
+		queryParams: StoryQueryDTO,
+	): Promise<{ items: StoryResponseDTO[]; nextCursor: string | null }> => {
+		return getPaginatedResults(
+			queryParams,
+			(params) => this.storyRepository.findPaginated(params),
+			StoryResponseDTO,
+			'storyId',
+		);
 	};
 
 	getStoryById = async (id: string): Promise<StoryResponseDTO> => {
