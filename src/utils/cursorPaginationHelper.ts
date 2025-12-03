@@ -20,12 +20,12 @@ export async function getPaginatedResults<
 	const entities = await findPaginated({
 		...queryParams,
 		startAfter: cursor,
-		limit: queryParams.limit + 1,
+		limit: Number(queryParams.limit) + 1,
 	});
 
-	const hasMore = entities.length > queryParams.limit;
+	const hasMore = entities.length > Number(queryParams.limit);
 	const list = entities
-		.slice(0, queryParams.limit)
+		.slice(0, Number(queryParams.limit))
 		.map((entity) => transformToDTO(ResponseDTO, entity));
 
 	let nextCursor: string | null = null;

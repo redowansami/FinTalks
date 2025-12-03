@@ -18,8 +18,9 @@ export class StoryController {
 	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
-		const query = req.query as unknown as StoryQueryDTO;
-		const result = await this.storyService.findAllStories(query);
+		const result = await this.storyService.findAllStories(
+			req.validatedReq.query as StoryQueryDTO,
+		);
 		res.status(HTTP_STATUS.OK).json({ success: true, ...result });
 	};
 

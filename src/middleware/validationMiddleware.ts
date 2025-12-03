@@ -1,10 +1,13 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction, Request } from 'express';
 import { ZodType } from 'zod';
+import '../types/globals';
 import { ErrorFactory } from '../errors/errorFactory';
 import { formatZodError } from '../utils/errorUtils';
 
 export const validateRequest = (schemas: { body?: ZodType; params?: ZodType; query?: ZodType }) => {
 	return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		req.validatedReq = {};
+
 		if (schemas.body) {
 			const result = schemas.body.safeParse(req.body);
 			if (!result.success) {
@@ -18,7 +21,7 @@ export const validateRequest = (schemas: { body?: ZodType; params?: ZodType; que
 			if (!result.success) {
 				throw ErrorFactory.validation(formatZodError(result.error));
 			}
-			req.params = result.data as Record<string, string>;
+			req.params = result.data as any;
 		}
 
 		if (schemas.query) {
@@ -26,8 +29,7 @@ export const validateRequest = (schemas: { body?: ZodType; params?: ZodType; que
 			if (!result.success) {
 				throw ErrorFactory.validation(formatZodError(result.error));
 			}
-			const params = new URLSearchParams(result.data as Record<string, string>);
-			req.url = `${req.path}?${params.toString()}`;
+			req.validatedReq.query = result.data;
 		}
 
 		next();
