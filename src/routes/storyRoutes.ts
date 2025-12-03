@@ -7,7 +7,7 @@ import {
 	storyIdSchema,
 	storyQuerySchema,
 	updateStorySchema,
-} from '../dtos/storyDTO';
+} from '../schemas/storySchema';
 import 'reflect-metadata';
 
 const router = Router();

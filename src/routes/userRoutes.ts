@@ -2,7 +2,12 @@ import { container } from 'tsyringe';
 import { UserController } from '../controllers/userController';
 import { Router } from 'express';
 import { validateRequest } from '../middleware/validationMiddleware';
-import { createUserSchema, updateUserSchema, userIdSchema, userQuerySchema } from '../dtos/userDTO';
+import {
+	createUserSchema,
+	updateUserSchema,
+	userIdSchema,
+	userQuerySchema,
+} from '../schemas/userSchema';
 
 const router = Router();
 const userController = container.resolve(UserController);
