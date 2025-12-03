@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
-import { UpdateUserDTO, UserQueryDTO } from '../dtos/userDTO';
+import { UserQueryDTO, CreateUserDTO } from '../dtos/userDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
+import '../types/globals';
+import { autoInjectable } from 'tsyringe';
 
+@autoInjectable()
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	create = async (req: Request, res: Response): Promise<void> => {
-		const result = await this.userService.createUser(req.body);
+		const result = await this.userService.createUser(req.body as CreateUserDTO);
 		res.status(HTTP_STATUS.CREATED).json({
 			success: true,
 			message: HTTP_MESSAGES.USER_CREATED,
@@ -16,8 +19,7 @@ export class UserController {
 	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
-		const query = req.query as unknown as UserQueryDTO;
-		const result = await this.userService.getAllUsersPaginated(query);
+		const result = await this.userService.findAllUsers(req.validatedReq.query as UserQueryDTO);
 		res.status(HTTP_STATUS.OK).json({ success: true, ...result });
 	};
 
@@ -28,11 +30,15 @@ export class UserController {
 		res.status(HTTP_STATUS.OK).json({ success: true, user });
 	};
 
-	patchUpdate = async (req: Request, res: Response): Promise<void> => {
+	update = async (req: Request, res: Response): Promise<void> => {
 		const userId = req.params.userId;
-		await this.userService.updateUser(userId, req.body as UpdateUserDTO);
+		const user = await this.userService.updateUser(userId, req.body);
 
-		res.status(HTTP_STATUS.OK).json({ success: true, message: HTTP_MESSAGES.USER_UPDATED });
+		res.status(HTTP_STATUS.OK).json({
+			success: true,
+			message: HTTP_MESSAGES.USER_UPDATED,
+			user,
+		});
 	};
 
 	delete = async (req: Request, res: Response): Promise<void> => {

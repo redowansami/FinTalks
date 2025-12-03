@@ -14,5 +14,5 @@ export function buildOffsetPaginationQuery<T extends ObjectLiteral>(
 		queryBuilder.orderBy(primaryOrderField, 'ASC');
 	}
 
-	return queryBuilder.skip(offset).take(limit);
+	return queryBuilder.skip(offset).take(limit + 1);
 }

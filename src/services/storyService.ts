@@ -5,7 +5,9 @@ import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO, StoryQueryDTO } from 
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { getPaginatedResults } from '../utils/cursorPaginationHelper';
+import { autoInjectable } from 'tsyringe';
 
+@autoInjectable()
 export class StoryService {
 	constructor(private readonly storyRepository: StoryRepository) {}
 
@@ -14,12 +16,12 @@ export class StoryService {
 		return transformToDTO(StoryResponseDTO, story);
 	};
 
-	getAllStoriesPaginated = async (
+	findAllStories = async (
 		queryParams: StoryQueryDTO,
-	): Promise<{ items: StoryResponseDTO[]; nextCursor: string | null }> => {
+	): Promise<{ list: StoryResponseDTO[]; nextCursor: string | null }> => {
 		return getPaginatedResults(
 			queryParams,
-			(params) => this.storyRepository.findPaginated(params),
+			(params) => this.storyRepository.findAll(params),
 			StoryResponseDTO,
 			'storyId',
 		);
@@ -33,9 +35,10 @@ export class StoryService {
 		return transformToDTO(StoryResponseDTO, story);
 	};
 
-	updateStory = async (id: string, updatedData: UpdateStoryDTO): Promise<void> => {
+	updateStory = async (id: string, updatedData: UpdateStoryDTO): Promise<StoryResponseDTO> => {
 		await this.getStoryById(id);
-		await this.storyRepository.update(id, updatedData);
+		const story = await this.storyRepository.update(id, updatedData);
+		return transformToDTO(StoryResponseDTO, story);
 	};
 
 	deleteStory = async (id: string): Promise<void> => {

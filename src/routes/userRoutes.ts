@@ -1,19 +1,26 @@
+import { container } from 'tsyringe';
+import { UserController } from '../controllers/userController';
 import { Router } from 'express';
-import { userController } from '../containers/userContainer';
 import { validateRequest } from '../middleware/validationMiddleware';
-import { createUserDTO, updateUserDTO, userIdDTO, userQueryDTO } from '../dtos/userDTO';
+import {
+	createUserSchema,
+	updateUserSchema,
+	userIdSchema,
+	userQuerySchema,
+} from '../schemas/userSchema';
 
 const router = Router();
+const userController = container.resolve(UserController);
 
 router
-	.post('/', validateRequest({ body: createUserDTO }), userController.create)
-	.get('/', validateRequest({ query: userQueryDTO }), userController.findAll)
-	.get('/:userId', validateRequest({ params: userIdDTO }), userController.findOne)
+	.post('/', validateRequest({ body: createUserSchema }), userController.create)
+	.get('/', validateRequest({ query: userQuerySchema }), userController.findAll)
+	.get('/:userId', validateRequest({ params: userIdSchema }), userController.findOne)
 	.patch(
 		'/:userId',
-		validateRequest({ params: userIdDTO, body: updateUserDTO }),
-		userController.patchUpdate,
+		validateRequest({ params: userIdSchema, body: updateUserSchema }),
+		userController.update,
 	)
-	.delete('/:userId', validateRequest({ params: userIdDTO }), userController.delete);
+	.delete('/:userId', validateRequest({ params: userIdSchema }), userController.delete);
 
 export default router;

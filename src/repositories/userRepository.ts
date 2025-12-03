@@ -17,7 +17,7 @@ export class UserRepository {
 		return this.repository.save(user);
 	};
 
-	findPaginated = async (queryParams: UserQueryDTO): Promise<User[]> => {
+	findAll = async (queryParams: UserQueryDTO): Promise<User[]> => {
 		const { search, orderBy, page, limit } = queryParams;
 		const queryBuilder = this.repository.createQueryBuilder('user');
 
@@ -47,9 +47,10 @@ export class UserRepository {
 		return this.repository.findOne({ where: { email } });
 	};
 
-	update = async (id: string, user: Partial<User>): Promise<boolean> => {
+	update = async (id: string, user: Partial<User>): Promise<User | null | undefined> => {
 		const result = await this.repository.update(id, user);
-		return result.affected === 1;
+		if (result.affected === 1) return this.findById(id);
+		else return null;
 	};
 
 	softDelete = async (id: string): Promise<boolean> => {

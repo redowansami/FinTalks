@@ -4,8 +4,9 @@ import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { getOffsetPaginatedResults } from '../utils/offsetPaginationHelper';
-import { UserRole } from '../entities/userEntity';
+import { autoInjectable } from 'tsyringe';
 
+@autoInjectable()
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
 
@@ -20,21 +21,16 @@ export class UserService {
 			throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
 		}
 
-		const userData = {
-			...data,
-			role: UserRole.USER,
-		};
-
-		const user = await this.userRepository.create(userData);
+		const user = await this.userRepository.create(data);
 		return transformToDTO(UserResponseDTO, user);
 	};
 
-	getAllUsersPaginated = async (
+	findAllUsers = async (
 		queryParams: UserQueryDTO,
-	): Promise<{ items: UserResponseDTO[]; page: number; nextPage: number | null }> => {
+	): Promise<{ list: UserResponseDTO[]; page: number; nextPage: number | null }> => {
 		return getOffsetPaginatedResults(
 			queryParams,
-			(params: UserQueryDTO) => this.userRepository.findPaginated(params),
+			(params: UserQueryDTO) => this.userRepository.findAll(params),
 			UserResponseDTO,
 		);
 	};
@@ -47,9 +43,10 @@ export class UserService {
 		return transformToDTO(UserResponseDTO, user);
 	};
 
-	updateUser = async (id: string, updatedData: UpdateUserDTO): Promise<void> => {
+	updateUser = async (id: string, updatedData: UpdateUserDTO): Promise<UserResponseDTO> => {
 		await this.getUserById(id);
-		await this.userRepository.update(id, updatedData);
+		const user = await this.userRepository.update(id, updatedData);
+		return transformToDTO(UserResponseDTO, user);
 	};
 
 	deleteUser = async (id: string): Promise<void> => {

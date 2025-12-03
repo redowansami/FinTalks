@@ -17,7 +17,7 @@ export class StoryRepository {
 		return this.repository.save(story);
 	};
 
-	findPaginated = async (queryParams: StoryQueryDTO): Promise<Story[]> => {
+	findAll = async (queryParams: StoryQueryDTO): Promise<Story[]> => {
 		const { search, orderBy, startAfter, limit } = queryParams;
 		const queryBuilder = this.repository
 			.createQueryBuilder('story')
@@ -40,9 +40,10 @@ export class StoryRepository {
 		return this.repository.findOne({ where: { storyId: id } });
 	};
 
-	update = async (id: string, story: Partial<Story>): Promise<boolean> => {
+	update = async (id: string, story: Partial<Story>): Promise<Story | null | undefined> => {
 		const result = await this.repository.update(id, story);
-		return result.affected === 1;
+		if (result.affected === 1) return this.findById(id);
+		else return null;
 	};
 
 	softDelete = async (id: string): Promise<boolean> => {
