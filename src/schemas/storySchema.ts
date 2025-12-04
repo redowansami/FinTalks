@@ -4,7 +4,6 @@ import { StoryOrderByFields } from '../constants/databaseConstants';
 
 export const createStorySchema = z
 	.object({
-		userId: z.uuid(VALIDATION_MESSAGES.INVALID_USER_ID),
 		title: z
 			.string()
 			.min(LENTGH_CONSTRAINTS.TITLE_MIN, VALIDATION_MESSAGES.TITLE_MIN)
@@ -16,7 +15,7 @@ export const createStorySchema = z
 	})
 	.strict();
 
-export const updateStorySchema = createStorySchema.partial().omit({ userId: true }).strict();
+export const updateStorySchema = createStorySchema.partial().strict();
 
 export const storyIdSchema = z.object({ storyId: z.uuid(VALIDATION_MESSAGES.INVALID_STORY_ID) });
 
