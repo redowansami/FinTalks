@@ -1,4 +1,3 @@
-// src/dtos/authDTO.ts
 import { z } from 'zod';
 import { LENTGH_CONSTRAINTS, VALIDATION_MESSAGES } from '../constants/validationConstants';
 
