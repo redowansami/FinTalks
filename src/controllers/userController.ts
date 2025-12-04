@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { UserQueryDTO, CreateUserDTO } from '../dtos/userDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
+import { User } from '../entities/userEntity';
 import '../types/globals';
 import { autoInjectable } from 'tsyringe';
 
@@ -30,7 +31,7 @@ export class UserController {
 		res.status(HTTP_STATUS.OK).json({ success: true, user });
 	};
 
-	update = async (req: Request, res: Response): Promise<void> => {
+	update = async (req: Request & { user?: User }, res: Response): Promise<void> => {
 		const userId = req.params.userId;
 		const user = await this.userService.updateUser(userId, req.body);
 
@@ -41,9 +42,20 @@ export class UserController {
 		});
 	};
 
-	delete = async (req: Request, res: Response): Promise<void> => {
+	delete = async (req: Request & { user?: User }, res: Response): Promise<void> => {
 		const userId = req.params.userId;
 		await this.userService.deleteUser(userId);
 		res.sendStatus(HTTP_STATUS.NO_CONTENT);
+	};
+
+	escalateToAdmin = async (req: Request & { user?: User }, res: Response): Promise<void> => {
+		const { userId } = req.body;
+		const user = await this.userService.escalateUserToAdmin(userId);
+
+		res.status(HTTP_STATUS.OK).json({
+			success: true,
+			message: HTTP_MESSAGES.USER_UPDATED,
+			user,
+		});
 	};
 }

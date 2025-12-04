@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { AppDataSource } from '../config/dataSource';
 import { User } from '../entities/userEntity';
 import { CreateUserDTO, UserQueryDTO } from 'dtos/userDTO';
@@ -12,9 +12,10 @@ export class UserRepository {
 		this.repository = AppDataSource.getRepository(User);
 	}
 
-	create = async (data: CreateUserDTO): Promise<User> => {
-		const user = this.repository.create(data);
-		return this.repository.save(user);
+	create = async (data: CreateUserDTO, manager?: EntityManager): Promise<User> => {
+		const repo = manager ? manager.getRepository(User) : this.repository;
+		const user = repo.create(data);
+		return repo.save(user);
 	};
 
 	findAll = async (queryParams: UserQueryDTO): Promise<User[]> => {
