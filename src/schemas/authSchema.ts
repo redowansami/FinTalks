@@ -33,22 +33,8 @@ export const signupSchema = z
 	})
 	.strict();
 
-export const loginSchema = z
-	.object({
-		email: z
-			.email(VALIDATION_MESSAGES.INVALID_EMAIL)
-			.max(LENTGH_CONSTRAINTS.EMAIL_MAX, VALIDATION_MESSAGES.EMAIL_MAX)
-			.trim(),
-		password: z
-			.string()
-			.min(LENTGH_CONSTRAINTS.PASSWORD_MIN, VALIDATION_MESSAGES.PASSWORD_MIN)
-			.max(LENTGH_CONSTRAINTS.PASSWORD_MAX, VALIDATION_MESSAGES.PASSWORD_MAX)
-			.regex(/[a-z]/, VALIDATION_MESSAGES.INVALID_PASSWORD_FORMAT)
-			.regex(/[A-Z]/, VALIDATION_MESSAGES.INVALID_PASSWORD_FORMAT)
-			.regex(/\d/, VALIDATION_MESSAGES.INVALID_PASSWORD_FORMAT)
-			.regex(
-				/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
-				VALIDATION_MESSAGES.INVALID_PASSWORD_FORMAT,
-			),
-	})
+export const loginSchema = signupSchema
+	.partial()
+	.omit({ username: true, name: true })
+	.required()
 	.strict();
