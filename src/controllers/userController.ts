@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
-import { UserQueryDTO, CreateUserDTO } from '../dtos/userDTO';
+import { UserQueryDTO } from '../dtos/userDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
 import { User } from '../entities/userEntity';
 import '../types/globals';
@@ -9,15 +9,6 @@ import { autoInjectable } from 'tsyringe';
 @autoInjectable()
 export class UserController {
 	constructor(private readonly userService: UserService) {}
-
-	create = async (req: Request, res: Response): Promise<void> => {
-		const result = await this.userService.createUser(req.body as CreateUserDTO);
-		res.status(HTTP_STATUS.CREATED).json({
-			success: true,
-			message: HTTP_MESSAGES.USER_CREATED,
-			user: result,
-		});
-	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
 		const result = await this.userService.findAllUsers(req.validatedReq.query as UserQueryDTO);

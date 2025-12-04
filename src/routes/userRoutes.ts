@@ -6,7 +6,6 @@ import { requireAuth } from '../middleware/authenticationMiddleware';
 import { requireRolesUser, requireAdmin } from '../middleware/authorizationMiddleware';
 import { UserRole } from '../entities/userEntity';
 import {
-	createUserSchema,
 	escalateToAdminSchema,
 	updateUserSchema,
 	userIdSchema,
@@ -17,7 +16,6 @@ const router = Router();
 const userController = container.resolve(UserController);
 
 router
-	.post('/', validateRequest({ body: createUserSchema }), userController.create)
 	.get('/', validateRequest({ query: userQuerySchema }), userController.findAll)
 	.patch(
 		'/escalate-to-admin',
