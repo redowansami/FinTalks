@@ -28,5 +28,9 @@ export const VALIDATION_MESSAGES = {
 	BODY_MIN: 'Body should be at least 10 characters long',
 	BODY_MAX: 'Body must be at most 5000 characters',
 	EMAIL_MAX: 'Email must be at most 255 characters',
+	PASSWORD_MIN: 'Password should be at least 6 characters long',
+	PASSWORD_MAX: 'Password must be at most 15 characters',
 	MAX_LIMIT: 'Limit must be at most 100',
+	INVALID_PASSWORD_FORMAT:
+		'Password should have at least one uppercase letter, one lowercase letter, one digit, and one special character',
 };
