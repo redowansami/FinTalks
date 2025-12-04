@@ -2,14 +2,16 @@ import { Request, Response } from 'express';
 import { StoryService } from '../services/storyService';
 import { StoryQueryDTO, UpdateStoryDTO } from '../dtos/storyDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
+import { User } from '../entities/userEntity';
 import { autoInjectable } from 'tsyringe';
 
 @autoInjectable()
 export class StoryController {
 	constructor(private readonly storyService: StoryService) {}
 
-	create = async (req: Request, res: Response): Promise<void> => {
-		const result = await this.storyService.createStory(req.body);
+	create = async (req: Request & { user?: User }, res: Response): Promise<void> => {
+		const userId = req.user?.userId;
+		const result = await this.storyService.createStory({ ...req.body, userId });
 		res.status(HTTP_STATUS.CREATED).json({
 			success: true,
 			message: HTTP_MESSAGES.STORY_CREATED,
