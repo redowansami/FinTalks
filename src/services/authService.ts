@@ -6,45 +6,50 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { transformToDTO } from '../utils/mapper';
 import { UserResponseDTO } from '../dtos/userDTO';
-import { autoInjectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 import { UserService } from './userService';
+import { TransactionService } from './transactionService';
 import { env } from '../utils/envParser';
-import { AppDataSource } from '../config/dataSource';
 
 const JWT_SECRET = env.JWT_SECRET;
 const JWT_EXPIRES_IN = env.JWT_EXPIRES_IN;
 const BCRYPT_SALT_ROUNDS = env.BCRYPT_SALT_ROUNDS;
 
-@autoInjectable()
+@injectable()
 export class AuthService {
 	constructor(
 		private readonly authRepository: AuthRepository,
 		private readonly userService: UserService,
+		private readonly transactionService: TransactionService,
 	) {}
 
 	signup = async (data: SignupDTO): Promise<UserResponseDTO> => {
-		return await AppDataSource.manager.transaction(async (transactionManager) => {
-			const user = await this.userService.createUser(
-				{
-					username: data.username,
-					name: data.name,
-					email: data.email,
-				},
-				transactionManager,
-			);
+		return await this.transactionService.execute(async (authRepo, userRepo) => {
+			const isUsernameFound = await userRepo.findByUsername(data.username);
+			if (isUsernameFound) {
+				throw ErrorFactory.conflict(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS);
+			}
+
+			const isEmailFound = await userRepo.findByEmail(data.email);
+			if (isEmailFound) {
+				throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
+			}
+
+			const user = await userRepo.create({
+				username: data.username,
+				name: data.name,
+				email: data.email,
+			});
 
 			const hashedPassword = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
 
-			await this.authRepository.create(
-				{
-					hashedPassword,
-					passwordLastModificationTime: new Date(),
-					userByUserId: { userId: user.userId } as any,
-				},
-				transactionManager,
-			);
+			await authRepo.create({
+				hashedPassword,
+				passwordLastModificationTime: new Date(),
+				userByUserId: { userId: user.userId } as any,
+			});
 
-			return user;
+			return transformToDTO(UserResponseDTO, user);
 		});
 	};
 
