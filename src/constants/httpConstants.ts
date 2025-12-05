@@ -29,4 +29,7 @@ export const HTTP_MESSAGES = {
 	CONFLICT_ERROR: 'Conflict error occurred',
 	USERNAME_ALREADY_EXISTS: 'Username already exists',
 	EMAIL_ALREADY_EXISTS: 'Email already exists',
+	INVALID_CREDENTIALS: 'Invalid email',
+	INVALID_PASSWORD: 'Invalid password',
+	INVALID_TOKEN: 'Invalid or expired token',
 };

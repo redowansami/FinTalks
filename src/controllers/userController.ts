@@ -1,22 +1,13 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
-import { UserQueryDTO, CreateUserDTO } from '../dtos/userDTO';
+import { UserQueryDTO } from '../dtos/userDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
 import '../types/globals';
-import { autoInjectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
-@autoInjectable()
+@injectable()
 export class UserController {
 	constructor(private readonly userService: UserService) {}
-
-	create = async (req: Request, res: Response): Promise<void> => {
-		const result = await this.userService.createUser(req.body as CreateUserDTO);
-		res.status(HTTP_STATUS.CREATED).json({
-			success: true,
-			message: HTTP_MESSAGES.USER_CREATED,
-			user: result,
-		});
-	};
 
 	findAll = async (req: Request, res: Response): Promise<void> => {
 		const result = await this.userService.findAllUsers(req.validatedReq.query as UserQueryDTO);
@@ -45,5 +36,16 @@ export class UserController {
 		const userId = req.params.userId;
 		await this.userService.deleteUser(userId);
 		res.sendStatus(HTTP_STATUS.NO_CONTENT);
+	};
+
+	escalateToAdmin = async (req: Request, res: Response): Promise<void> => {
+		const { userId } = req.body;
+		const user = await this.userService.escalateUserToAdmin(userId);
+
+		res.status(HTTP_STATUS.OK).json({
+			success: true,
+			message: HTTP_MESSAGES.USER_UPDATED,
+			user,
+		});
 	};
 }

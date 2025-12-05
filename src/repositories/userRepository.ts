@@ -1,15 +1,20 @@
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { AppDataSource } from '../config/dataSource';
 import { User } from '../entities/userEntity';
 import { CreateUserDTO, UserQueryDTO } from 'dtos/userDTO';
 import { buildOffsetPaginationQuery } from '../utils/offsetPaginationQuery';
 import { applyFuzzySearch } from '../utils/fuzzySearch';
+import { inject, injectable } from 'tsyringe';
+import { ENTITY_MANAGER } from '../constants/tokens';
 
+@injectable()
 export class UserRepository {
 	private repository: Repository<User>;
 
-	constructor() {
-		this.repository = AppDataSource.getRepository(User);
+	constructor(@inject(ENTITY_MANAGER) private manager?: EntityManager) {
+		this.repository = this.manager
+			? this.manager.getRepository(User)
+			: AppDataSource.getRepository(User);
 	}
 
 	create = async (data: CreateUserDTO): Promise<User> => {

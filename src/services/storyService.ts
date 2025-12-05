@@ -5,9 +5,9 @@ import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO, StoryQueryDTO } from 
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { getPaginatedResults } from '../utils/cursorPaginationHelper';
-import { autoInjectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
-@autoInjectable()
+@injectable()
 export class StoryService {
 	constructor(private readonly storyRepository: StoryRepository) {}
 

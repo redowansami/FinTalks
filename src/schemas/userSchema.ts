@@ -37,3 +37,9 @@ export const userQuerySchema = z.object({
 		.max(LENTGH_CONSTRAINTS.MAX_LIMIT, VALIDATION_MESSAGES.MAX_LIMIT)
 		.default(LENTGH_CONSTRAINTS.DEFAULT_PAGINATION_LIMIT),
 });
+
+export const escalateToAdminSchema = z
+	.object({
+		userId: z.uuid('Invalid user ID format'),
+	})
+	.strict();

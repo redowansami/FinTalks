@@ -4,20 +4,22 @@ import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { getOffsetPaginatedResults } from '../utils/offsetPaginationHelper';
-import { autoInjectable } from 'tsyringe';
 
-@autoInjectable()
+import { UserRole } from '../entities/userEntity';
+import { injectable } from 'tsyringe';
+
+@injectable()
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
 
 	createUser = async (data: CreateUserDTO): Promise<UserResponseDTO> => {
-		const existingUsername = await this.userRepository.findByUsername(data.username);
-		if (existingUsername) {
+		const isUsernameFound = await this.userRepository.findByUsername(data.username);
+		if (isUsernameFound) {
 			throw ErrorFactory.conflict(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS);
 		}
 
-		const existingEmail = await this.userRepository.findByEmail(data.email);
-		if (existingEmail) {
+		const isEmailFound = await this.userRepository.findByEmail(data.email);
+		if (isEmailFound) {
 			throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
 		}
 
@@ -43,6 +45,14 @@ export class UserService {
 		return transformToDTO(UserResponseDTO, user);
 	};
 
+	getUserByEmail = async (email: string): Promise<UserResponseDTO | null> => {
+		const user = await this.userRepository.findByEmail(email);
+		if (!user) {
+			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+		}
+		return transformToDTO(UserResponseDTO, user);
+	};
+
 	updateUser = async (id: string, updatedData: UpdateUserDTO): Promise<UserResponseDTO> => {
 		await this.getUserById(id);
 		const user = await this.userRepository.update(id, updatedData);
@@ -52,5 +62,11 @@ export class UserService {
 	deleteUser = async (id: string): Promise<void> => {
 		await this.getUserById(id);
 		await this.userRepository.softDelete(id);
+	};
+
+	escalateUserToAdmin = async (id: string): Promise<UserResponseDTO> => {
+		await this.getUserById(id);
+		const user = await this.userRepository.update(id, { role: UserRole.ADMIN });
+		return transformToDTO(UserResponseDTO, user);
 	};
 }
