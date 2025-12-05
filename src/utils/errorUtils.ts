@@ -5,7 +5,15 @@ import { ZodError } from 'zod';
 export function formatZodError(error: ZodError): ValidationErrorDetail {
 	return error.issues.reduce((acc, err) => {
 		const path = err.path.join('.');
-		acc[path] = err.message;
+		if (acc[path]) {
+			if (Array.isArray(acc[path])) {
+				(acc[path] as string[]).push(err.message);
+			} else {
+				acc[path] = [acc[path] as string, err.message];
+			}
+		} else {
+			acc[path] = err.message;
+		}
 		return acc;
 	}, {} as ValidationErrorDetail);
 }
