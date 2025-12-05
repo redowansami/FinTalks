@@ -31,6 +31,8 @@ export const VALIDATION_MESSAGES = {
 	PASSWORD_MIN: 'Password should be at least 6 characters long',
 	PASSWORD_MAX: 'Password must be at most 15 characters',
 	MAX_LIMIT: 'Limit must be at most 100',
-	INVALID_PASSWORD_FORMAT:
-		'Password should have at least one uppercase letter, one lowercase letter, one digit, and one special character',
+	UPPERCASE_LETTER: 'Password should contain at least one uppercase letter',
+	LOWERCASE_LETTER: 'Password should contain at least one lowercase letter',
+	DIGIT: 'Password should contain at least one digit',
+	SPECIAL_CHARACTER: 'Password should contain at least one special character',
 };
