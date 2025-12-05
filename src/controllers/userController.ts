@@ -3,9 +3,9 @@ import { UserService } from '../services/userService';
 import { UserQueryDTO } from '../dtos/userDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
 import '../types/globals';
-import { autoInjectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
-@autoInjectable()
+@injectable()
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 

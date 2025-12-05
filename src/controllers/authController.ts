@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/authService';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
-import { autoInjectable } from 'tsyringe';
 import { SignupDTO, LoginDTO } from '../dtos/authDTO';
+import { injectable } from 'tsyringe';
 
-@autoInjectable()
+@injectable()
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
