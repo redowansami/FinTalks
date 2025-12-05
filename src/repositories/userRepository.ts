@@ -4,18 +4,22 @@ import { User } from '../entities/userEntity';
 import { CreateUserDTO, UserQueryDTO } from 'dtos/userDTO';
 import { buildOffsetPaginationQuery } from '../utils/offsetPaginationQuery';
 import { applyFuzzySearch } from '../utils/fuzzySearch';
+import { inject, injectable } from 'tsyringe';
+import { ENTITY_MANAGER } from '../constants/tokens';
 
+@injectable()
 export class UserRepository {
 	private repository: Repository<User>;
 
-	constructor() {
-		this.repository = AppDataSource.getRepository(User);
+	constructor(@inject(ENTITY_MANAGER) private manager?: EntityManager) {
+		this.repository = this.manager
+			? this.manager.getRepository(User)
+			: AppDataSource.getRepository(User);
 	}
 
-	create = async (data: CreateUserDTO, manager?: EntityManager): Promise<User> => {
-		const repo = manager ? manager.getRepository(User) : this.repository;
-		const user = repo.create(data);
-		return repo.save(user);
+	create = async (data: CreateUserDTO): Promise<User> => {
+		const user = this.repository.create(data);
+		return this.repository.save(user);
 	};
 
 	findAll = async (queryParams: UserQueryDTO): Promise<User[]> => {
