@@ -4,15 +4,15 @@ import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { getOffsetPaginatedResults } from '../utils/offsetPaginationHelper';
-import { autoInjectable } from 'tsyringe';
-import { EntityManager } from 'typeorm';
-import { UserRole } from '../entities/userEntity';
 
-@autoInjectable()
+import { UserRole } from '../entities/userEntity';
+import { injectable } from 'tsyringe';
+
+@injectable()
 export class UserService {
 	constructor(private readonly userRepository: UserRepository) {}
 
-	createUser = async (data: CreateUserDTO, manager?: EntityManager): Promise<UserResponseDTO> => {
+	createUser = async (data: CreateUserDTO): Promise<UserResponseDTO> => {
 		const isUsernameFound = await this.userRepository.findByUsername(data.username);
 		if (isUsernameFound) {
 			throw ErrorFactory.conflict(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS);
@@ -23,7 +23,7 @@ export class UserService {
 			throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
 		}
 
-		const user = await this.userRepository.create(data, manager);
+		const user = await this.userRepository.create(data);
 		return transformToDTO(UserResponseDTO, user);
 	};
 
