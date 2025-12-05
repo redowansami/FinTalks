@@ -3,9 +3,9 @@ import { StoryService } from '../services/storyService';
 import { StoryQueryDTO, UpdateStoryDTO } from '../dtos/storyDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
 import { User } from '../entities/userEntity';
-import { autoInjectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
-@autoInjectable()
+@injectable()
 export class StoryController {
 	constructor(private readonly storyService: StoryService) {}
 
