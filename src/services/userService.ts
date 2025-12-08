@@ -91,4 +91,8 @@ export class UserService {
 		const user = await this.userRepository.update(id, { role: UserRole.ADMIN });
 		return transformToDTO(UserResponseDTO, user);
 	};
+
+	confirmEmailAddress = async (id: string): Promise<void> => {
+		await this.userRepository.update(id, { isEmailConfirmed: true });
+	};
 }
