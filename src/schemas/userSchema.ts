@@ -43,3 +43,9 @@ export const escalateToAdminSchema = z
 		userId: z.uuid('Invalid user ID format'),
 	})
 	.strict();
+
+export const emailConfirmationSchema = z
+	.object({
+		isEmailConfirmed: z.boolean(),
+	})
+	.strict();
