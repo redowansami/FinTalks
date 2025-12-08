@@ -38,4 +38,12 @@ export const HTTP_MESSAGES = {
 	EMAIL_CONFIRMED_SUCCESSFULLY: 'Email confirmed successfully. You can now login.',
 	EMAIL_CONFIRMATION_RESENT: 'Confirmation email resent successfully. Please check your email.',
 	EMAIL_NOT_CONFIRMED: 'Please confirm your email before logging in',
+	CATEGORY_CREATED: 'Category created successfully',
+	CATEGORY_FETCHED: 'Category fetched successfully',
+	CATEGORY_UPDATED: 'Category updated successfully',
+	CATEGORY_DELETED: 'Category deleted successfully',
+	CATEGORY_EXISTS: 'Category already exists',
+	CATEGORY_NOT_FOUND: 'Category not found',
+	INVALID_CATEGORIES: 'One or more categories do not exist',
+	SEEDED_SUCCESSFULLY: 'Categories seeded successfully',
 };
