@@ -8,6 +8,7 @@ import { UserRole } from '../entities/userEntity';
 import {
 	createStorySchema,
 	storyIdSchema,
+	storyAndCategoryIdSchema,
 	storyQuerySchema,
 	updateStorySchema,
 } from '../schemas/storySchema';
@@ -26,6 +27,13 @@ router
 		requireRolesStory(),
 		validateRequest({ params: storyIdSchema, body: updateStorySchema }),
 		storyController.update,
+	)
+	.delete(
+		'/:storyId/categories/:categoryId',
+		requireAuth,
+		requireRolesStory(),
+		validateRequest({ params: storyAndCategoryIdSchema }),
+		storyController.removeCategory,
 	)
 	.delete(
 		'/:storyId',
