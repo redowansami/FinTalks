@@ -5,10 +5,12 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	ManyToOne,
+	ManyToMany,
 	JoinColumn,
 	DeleteDateColumn,
 } from 'typeorm';
 import { User } from './userEntity';
+import { Category } from './categoryEntity';
 import { LENTGH_CONSTRAINTS } from '../constants/validationConstants';
 
 @Entity('stories')
@@ -37,4 +39,7 @@ export class Story {
 	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'userId' })
 	userByUserId: User;
+
+	@ManyToMany(() => Category, (category) => category.stories)
+	categories: Category[];
 }
