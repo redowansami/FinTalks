@@ -12,6 +12,7 @@ export const createStorySchema = z
 			.string()
 			.min(LENTGH_CONSTRAINTS.BODY_MIN, VALIDATION_MESSAGES.BODY_MIN)
 			.max(LENTGH_CONSTRAINTS.BODY_MAX, VALIDATION_MESSAGES.BODY_MAX),
+		categoryIds: z.array(z.uuid()).optional(),
 	})
 	.strict();
 
@@ -19,9 +20,15 @@ export const updateStorySchema = createStorySchema.partial().strict();
 
 export const storyIdSchema = z.object({ storyId: z.uuid(VALIDATION_MESSAGES.INVALID_STORY_ID) });
 
+export const storyAndCategoryIdSchema = z.object({
+	storyId: z.uuid(VALIDATION_MESSAGES.INVALID_STORY_ID),
+	categoryId: z.uuid(VALIDATION_MESSAGES.INVALID_CATEGORY_ID),
+});
+
 export const storyQuerySchema = z.object({
 	search: z.string().optional(),
 	orderBy: z.enum(StoryOrderByFields).optional(),
+	category: z.string().optional(),
 	startAfter: z.string().optional(),
 	limit: z.coerce
 		.number()

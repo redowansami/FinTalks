@@ -1,11 +1,12 @@
 import { z } from 'zod';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
 	createStorySchema,
 	storyIdSchema,
 	storyQuerySchema,
 	updateStorySchema,
 } from '../schemas/storySchema';
+import { CategoryResponseDTO } from './categoryDTO';
 
 export type CreateStoryDTO = z.infer<typeof createStorySchema>;
 export type UpdateStoryDTO = z.infer<typeof updateStorySchema>;
@@ -19,4 +20,5 @@ export class StoryResponseDTO {
 	@Expose() body: string;
 	@Expose() createdAt: Date;
 	@Expose() updatedAt: Date;
+	@Expose() @Type(() => CategoryResponseDTO) categories?: CategoryResponseDTO[];
 }
