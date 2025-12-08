@@ -1,18 +1,42 @@
 import { Story } from '../entities/storyEntity';
 import { StoryRepository } from '../repositories/storyRepository';
+import { CategoryService } from './categoryService';
 import { ErrorFactory } from '../errors/errorFactory';
 import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO, StoryQueryDTO } from '../dtos/storyDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { getPaginatedResults } from '../utils/cursorPaginationHelper';
 import { injectable } from 'tsyringe';
+import { Category } from 'entities/categoryEntity';
 
 @injectable()
 export class StoryService {
-	constructor(private readonly storyRepository: StoryRepository) {}
+	constructor(
+		private readonly storyRepository: StoryRepository,
+		private readonly categoryService: CategoryService,
+	) {}
+
+	private attachCategories = async (story: Story, categoryIds: string[]): Promise<void> => {
+		if (!categoryIds || categoryIds.length === 0) {
+			return;
+		}
+
+		const categories = await this.categoryService.getCategoriesByIds(categoryIds);
+		if (categories.length !== categoryIds.length) {
+			throw ErrorFactory.conflict(HTTP_MESSAGES.INVALID_CATEGORIES);
+		}
+
+		story.categories = categories as Category[];
+		await this.storyRepository.save(story);
+	};
 
 	createStory = async (data: CreateStoryDTO): Promise<StoryResponseDTO> => {
 		const story = await this.storyRepository.create(data);
+
+		if (data.categoryIds && data.categoryIds.length > 0) {
+			await this.attachCategories(story, data.categoryIds);
+		}
+
 		return transformToDTO(StoryResponseDTO, story);
 	};
 
@@ -37,12 +61,60 @@ export class StoryService {
 
 	updateStory = async (id: string, updatedData: UpdateStoryDTO): Promise<StoryResponseDTO> => {
 		await this.getStoryById(id);
-		const story = await this.storyRepository.update(id, updatedData);
-		return transformToDTO(StoryResponseDTO, story);
+
+		const { categoryIds, ...storyData } = updatedData;
+
+		await this.storyRepository.update(id, storyData);
+
+		if (categoryIds) {
+			await this.addCategoriesToStory(id, categoryIds);
+		}
+
+		const updatedStory = await this.storyRepository.findById(id);
+		if (!updatedStory) {
+			throw ErrorFactory.notFound(HTTP_MESSAGES.STORY_NOT_FOUND);
+		}
+
+		return transformToDTO(StoryResponseDTO, updatedStory);
 	};
 
 	deleteStory = async (id: string): Promise<void> => {
 		await this.getStoryById(id);
 		await this.storyRepository.softDelete(id);
+	};
+
+	addCategoriesToStory = async (
+		storyId: string,
+		categoryIds: string[],
+	): Promise<StoryResponseDTO> => {
+		const story = await this.storyRepository.findById(storyId);
+		if (!story) {
+			throw ErrorFactory.notFound(HTTP_MESSAGES.STORY_NOT_FOUND);
+		}
+
+		const newCategories = await this.categoryService.getCategoriesByIds(categoryIds);
+		if (newCategories.length !== categoryIds.length) {
+			throw ErrorFactory.conflict(HTTP_MESSAGES.INVALID_CATEGORIES);
+		}
+
+		story.categories = [...(story.categories || []), ...(newCategories as Category[])];
+		await this.storyRepository.save(story);
+
+		return transformToDTO(StoryResponseDTO, story);
+	};
+
+	removeCategoryFromStory = async (
+		storyId: string,
+		categoryId: string,
+	): Promise<StoryResponseDTO> => {
+		const story = await this.storyRepository.findById(storyId);
+		if (!story) {
+			throw ErrorFactory.notFound(HTTP_MESSAGES.STORY_NOT_FOUND);
+		}
+
+		story.categories = (story.categories || []).filter((cat) => cat.categoryId !== categoryId);
+		await this.storyRepository.save(story);
+
+		return transformToDTO(StoryResponseDTO, story);
 	};
 }
