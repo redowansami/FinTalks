@@ -32,4 +32,10 @@ export const HTTP_MESSAGES = {
 	INVALID_CREDENTIALS: 'Invalid email',
 	INVALID_PASSWORD: 'Invalid password',
 	INVALID_TOKEN: 'Invalid or expired token',
+	EMAIL_CONFIRMATION_SENT:
+		'Confirmation email sent successfully. Please check your email to verify your account.',
+	EMAIL_ALREADY_CONFIRMED: 'Email is already confirmed',
+	EMAIL_CONFIRMED_SUCCESSFULLY: 'Email confirmed successfully. You can now login.',
+	EMAIL_CONFIRMATION_RESENT: 'Confirmation email resent successfully. Please check your email.',
+	EMAIL_NOT_CONFIRMED: 'Please confirm your email before logging in',
 };

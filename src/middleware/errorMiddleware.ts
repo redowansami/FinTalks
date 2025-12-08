@@ -4,6 +4,7 @@ import { AppError } from '../errors/appError';
 import { handleDatabaseError } from '../utils/errorUtils';
 import { HTTP_MESSAGES, HTTP_STATUS } from '../constants/httpConstants';
 import { env } from '../utils/envParser';
+import jwt from 'jsonwebtoken';
 
 interface ErrorResponsePayload {
 	success: boolean;
@@ -41,6 +42,19 @@ export const errorHandler = (
 		}
 
 		return res.status(err.statusCode).json(response);
+	}
+
+	if (err instanceof jwt.JsonWebTokenError || err instanceof jwt.TokenExpiredError) {
+		const response: ErrorResponsePayload = {
+			success: false,
+			message: HTTP_MESSAGES.INVALID_TOKEN,
+		};
+
+		if (isDevelopment) {
+			response.stack = err.stack;
+		}
+
+		return res.status(HTTP_STATUS.UNAUTHORIZED).json(response);
 	}
 
 	if (err instanceof Error && 'code' in err) {
