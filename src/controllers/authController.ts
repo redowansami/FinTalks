@@ -13,7 +13,7 @@ export class AuthController {
 		const user = await this.authService.signup(data);
 		res.status(HTTP_STATUS.CREATED).json({
 			success: true,
-			message: HTTP_MESSAGES.USER_CREATED,
+			message: HTTP_MESSAGES.EMAIL_CONFIRMATION_SENT,
 			user,
 		});
 	};
@@ -22,5 +22,24 @@ export class AuthController {
 		const data = req.body as LoginDTO;
 		const { token, user } = await this.authService.login(data);
 		res.status(HTTP_STATUS.OK).json({ success: true, token, user });
+	};
+
+	confirmEmail = async (req: Request, res: Response): Promise<void> => {
+		const { token } = req.params;
+		const result = await this.authService.confirmEmail(token);
+		res.status(HTTP_STATUS.OK).json({
+			success: true,
+			message: result.message,
+			isConfirmed: result.isConfirmed,
+		});
+	};
+
+	resendConfirmationEmail = async (req: Request, res: Response): Promise<void> => {
+		const { email } = req.body;
+		const result = await this.authService.resendConfirmationEmail(email);
+		res.status(HTTP_STATUS.OK).json({
+			success: true,
+			message: result.message,
+		});
 	};
 }
