@@ -1,6 +1,12 @@
 import { UserRepository } from '../repositories/userRepository';
 import { ErrorFactory } from '../errors/errorFactory';
-import { CreateUserDTO, UpdateUserDTO, UserResponseDTO, UserQueryDTO } from '../dtos/userDTO';
+import {
+	CreateUserDTO,
+	UpdateUserDTO,
+	UserResponseDTO,
+	UserQueryDTO,
+	SignupResponseDTO,
+} from '../dtos/userDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
 import { getOffsetPaginatedResults } from '../utils/offsetPaginationHelper';
@@ -53,6 +59,22 @@ export class UserService {
 		return transformToDTO(UserResponseDTO, user);
 	};
 
+	getUserByIdRaw = async (id: string): Promise<SignupResponseDTO> => {
+		const user = await this.userRepository.findById(id);
+		if (!user) {
+			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+		}
+		return transformToDTO(SignupResponseDTO, user);
+	};
+
+	getUserByEmailRaw = async (email: string): Promise<SignupResponseDTO> => {
+		const user = await this.userRepository.findByEmail(email);
+		if (!user) {
+			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+		}
+		return transformToDTO(SignupResponseDTO, user);
+	};
+
 	updateUser = async (id: string, updatedData: UpdateUserDTO): Promise<UserResponseDTO> => {
 		await this.getUserById(id);
 		const user = await this.userRepository.update(id, updatedData);
@@ -68,5 +90,9 @@ export class UserService {
 		await this.getUserById(id);
 		const user = await this.userRepository.update(id, { role: UserRole.ADMIN });
 		return transformToDTO(UserResponseDTO, user);
+	};
+
+	confirmEmailAddress = async (id: string): Promise<void> => {
+		await this.userRepository.update(id, { isEmailConfirmed: true });
 	};
 }

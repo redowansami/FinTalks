@@ -34,3 +34,7 @@ export const loginSchema = signupSchema
 	.omit({ username: true, name: true })
 	.required()
 	.strict();
+
+export const resendConfirmationEmailSchema = z.object({
+	email: z.email(VALIDATION_MESSAGES.INVALID_EMAIL).trim(),
+});
