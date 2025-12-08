@@ -36,6 +36,9 @@ export class User {
 	})
 	role: UserRole;
 
+	@Column({ type: 'boolean', default: false })
+	isEmailConfirmed: boolean;
+
 	@DeleteDateColumn({ type: 'timestamp', nullable: true })
 	deletedAt: Date | null;
 }

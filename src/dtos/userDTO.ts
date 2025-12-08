@@ -20,3 +20,7 @@ export class UserResponseDTO {
 	@Expose() joinDate: Date;
 	@Expose() role: string;
 }
+
+export class SignupResponseDTO extends UserResponseDTO {
+	@Expose() isEmailConfirmed: boolean;
+}
