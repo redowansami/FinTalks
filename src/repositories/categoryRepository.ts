@@ -28,6 +28,13 @@ export class CategoryRepository {
 		});
 	};
 
+	findByIds = async (categoryIds: string[]): Promise<Category[]> => {
+		if (categoryIds.length === 0) return [];
+		return this.repository.find({
+			where: categoryIds.map((id) => ({ categoryId: id })),
+		});
+	};
+
 	findByName = async (name: string): Promise<Category | null> => {
 		return this.repository.findOne({
 			where: { name },
@@ -42,12 +49,5 @@ export class CategoryRepository {
 	delete = async (categoryId: string): Promise<boolean> => {
 		const result = await this.repository.delete({ categoryId });
 		return result.affected ? result.affected > 0 : false;
-	};
-
-	findByIds = async (categoryIds: string[]): Promise<Category[]> => {
-		if (categoryIds.length === 0) return [];
-		return this.repository.find({
-			where: categoryIds.map((id) => ({ categoryId: id })),
-		});
 	};
 }
