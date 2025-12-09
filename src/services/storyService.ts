@@ -17,7 +17,7 @@ export class StoryService {
 	) {}
 
 	private attachCategories = async (story: Story, categoryIds: string[]): Promise<void> => {
-		if (!categoryIds || categoryIds.length === 0) {
+		if (categoryIds.length === 0) {
 			return;
 		}
 
@@ -33,7 +33,7 @@ export class StoryService {
 	createStory = async (data: CreateStoryDTO): Promise<StoryResponseDTO> => {
 		const story = await this.storyRepository.create(data);
 
-		if (data.categoryIds && data.categoryIds.length > 0) {
+		if (data.categoryIds) {
 			await this.attachCategories(story, data.categoryIds);
 		}
 
