@@ -10,7 +10,7 @@ import {
 	createCategorySchema,
 	updateCategorySchema,
 } from '../schemas/categorySchema';
-import { HTTP_MESSAGES } from 'constants/httpConstants';
+import { HTTP_MESSAGES } from '../constants/httpConstants';
 
 const router = Router();
 const categoryController = container.resolve(CategoryController);
