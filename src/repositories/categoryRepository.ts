@@ -24,6 +24,7 @@ export class CategoryRepository {
 	findById = async (categoryId: string): Promise<Category | null> => {
 		return this.repository.findOne({
 			where: { categoryId },
+			relations: ['stories'],
 		});
 	};
 
