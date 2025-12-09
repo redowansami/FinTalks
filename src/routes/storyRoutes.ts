@@ -33,7 +33,7 @@ router
 		requireAuth,
 		requireRolesStory(),
 		validateRequest({ params: storyAndCategoryIdSchema }),
-		storyController.removeCategory,
+		storyController.removeCategoryFromStory,
 	)
 	.delete(
 		'/:storyId',
