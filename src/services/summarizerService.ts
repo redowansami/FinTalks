@@ -57,6 +57,64 @@ Do NOT use backticks.
 
 Content to analyze:
 \${content}`;
+
+	private readonly MAX_RETRIES = env.AI_SUMMARIZATION_MAX_RETRIES;
+	private readonly TIMEOUT_MS = env.AI_SUMMARIZATION_TIMEOUT_MS;
+	private readonly API_KEY = env.OPENROUTER_API_KEY;
+	private readonly MODEL = env.OPENROUTER_MODEL;
+
+	private extractAndParseJson(raw: string): SummarizerResponse {
+		let jsonText = raw.trim();
+
+		const mdMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+		if (mdMatch) {
+			jsonText = mdMatch[1].trim();
+		}
+
+		const objMatch = jsonText.match(/\{[\s\S]*\}/);
+		if (objMatch) {
+			jsonText = objMatch[0];
+		}
+
+		jsonText = this.sanitizeJson(jsonText);
+
+		try {
+			return JSON.parse(jsonText);
+		} catch {
+			throw new Error(AI_ERROR_MESSAGES.JSON_PARSE_FAILED);
+		}
+	}
+
+	private sanitizeJson(text: string): string {
+		return text
+			.replace(/```/g, '')
+			.replace(/[“”]/g, '"')
+			.replace(/[‘’]/g, "'")
+			.replace(/,\s*([}\]])/g, '$1')
+			.replace(/([^\\])"/g, '$1"')
+
+			.trim();
+	}
+
+	private async fetchWithTimeout(
+		url: string,
+		options: RequestInit,
+		timeoutMs: number,
+	): Promise<Response> {
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+		try {
+			return await fetch(url, { ...options, signal: controller.signal });
+		} finally {
+			clearTimeout(timeoutId);
+		}
+	}
+
+	private async exponentialBackoff(attempt: number): Promise<void> {
+		const delay = Math.min(1000 * Math.pow(2, attempt), 30000);
+		return new Promise((resolve) => setTimeout(resolve, delay));
+	}
 }
 
 export default new SummarizerService();
