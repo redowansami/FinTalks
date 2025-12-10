@@ -63,6 +63,73 @@ Content to analyze:
 	private readonly API_KEY = env.OPENROUTER_API_KEY;
 	private readonly MODEL = env.OPENROUTER_MODEL;
 
+	async generateStorySummary(content: string): Promise<SummarizerResponse> {
+		if (!this.API_KEY) {
+			throw new Error(AI_ERROR_MESSAGES.API_KEY_NOT_SET);
+		}
+
+		const prompt = this.SUMMARIZATION_PROMPT_TEMPLATE.replace('${content}', content);
+		const response = await this.callOpenRouterWithRetry(prompt);
+		return response;
+	}
+
+	private async callOpenRouterWithRetry(prompt: string): Promise<SummarizerResponse> {
+		let lastError: unknown = null;
+
+		for (let attempt = 0; attempt < this.MAX_RETRIES; attempt++) {
+			const response = await this.fetchWithTimeout(
+				'https://openrouter.ai/api/v1/chat/completions',
+				{
+					method: 'POST',
+					headers: {
+						Authorization: `Bearer ${this.API_KEY}`,
+						'HTTP-Referer': env.BACKEND_URL,
+						'X-Title': 'FinTalks Financial Blog',
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						model: this.MODEL,
+						messages: [{ role: 'user', content: prompt }],
+					}),
+				},
+				this.TIMEOUT_MS,
+			);
+
+			const data = (await response.json()) as OpenRouterResponse;
+
+			if (data.error) {
+				const code = data.error.code;
+				if (code === '429' || code === 'rate_limit_exceeded') {
+					lastError = new Error(
+						`${AI_ERROR_MESSAGES.RATE_LIMITED_PREFIX}: ${data.error.message}`,
+					);
+					if (attempt < this.MAX_RETRIES - 1) {
+						await this.exponentialBackoff(attempt);
+					}
+					continue;
+				}
+				throw new Error(
+					`${AI_ERROR_MESSAGES.SUMMARIZATION_FAILED}: ${data.error.message || AI_ERROR_MESSAGES.UNKNOWN_ERROR}`,
+				);
+			}
+
+			const text = data.choices?.[0]?.message?.content;
+			if (!text)
+				throw new Error(
+					`${AI_ERROR_MESSAGES.SUMMARIZATION_FAILED}: ${AI_ERROR_MESSAGES.EMPTY_RESPONSE}`,
+				);
+
+			return this.extractAndParseJson(text);
+		}
+
+		throw (
+			lastError ||
+			new Error(
+				`${AI_ERROR_MESSAGES.SUMMARIZATION_FAILED}: ${AI_ERROR_MESSAGES.FAILED_RETRIES}`,
+			)
+		);
+	}
+
 	private extractAndParseJson(raw: string): SummarizerResponse {
 		let jsonText = raw.trim();
 
