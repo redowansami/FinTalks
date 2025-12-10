@@ -49,4 +49,12 @@ export class StoryController {
 		await this.storyService.deleteStory(storyId);
 		res.sendStatus(HTTP_STATUS.NO_CONTENT);
 	};
+
+	removeCategoryFromStory = async (req: Request, res: Response): Promise<void> => {
+		const storyId = req.params.storyId;
+		const categoryId = req.params.categoryId;
+		await this.storyService.removeCategoryFromStory(storyId, categoryId);
+
+		res.sendStatus(HTTP_STATUS.NO_CONTENT);
+	};
 }

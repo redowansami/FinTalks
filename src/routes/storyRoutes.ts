@@ -8,6 +8,7 @@ import { UserRole } from '../entities/userEntity';
 import {
 	createStorySchema,
 	storyIdSchema,
+	storyAndCategoryIdSchema,
 	storyQuerySchema,
 	updateStorySchema,
 } from '../schemas/storySchema';
@@ -19,6 +20,13 @@ const storyController = container.resolve(StoryController);
 router
 	.post('/', requireAuth, validateRequest({ body: createStorySchema }), storyController.create)
 	.get('/', validateRequest({ query: storyQuerySchema }), storyController.findAll)
+	.delete(
+		'/:storyId/categories/:categoryId',
+		requireAuth,
+		requireRolesStory(),
+		validateRequest({ params: storyAndCategoryIdSchema }),
+		storyController.removeCategoryFromStory,
+	)
 	.get('/:storyId', validateRequest({ params: storyIdSchema }), storyController.findOne)
 	.patch(
 		'/:storyId',

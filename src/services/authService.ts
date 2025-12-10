@@ -122,7 +122,7 @@ export class AuthService {
 
 		if (userRaw.isEmailConfirmed) {
 			return {
-				message: HTTP_MESSAGES.EMAIL_CONFIRMATION_RESENT,
+				message: HTTP_MESSAGES.EMAIL_ALREADY_CONFIRMED,
 			};
 		}
 

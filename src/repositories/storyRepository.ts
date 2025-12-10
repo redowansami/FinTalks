@@ -18,10 +18,11 @@ export class StoryRepository {
 	};
 
 	findAll = async (queryParams: StoryQueryDTO): Promise<Story[]> => {
-		const { search, orderBy, startAfter, limit } = queryParams;
+		const { search, orderBy, category, startAfter, limit } = queryParams;
 		const queryBuilder = this.repository
 			.createQueryBuilder('story')
-			.leftJoinAndSelect('story.userByUserId', 'user');
+			.leftJoinAndSelect('story.userByUserId', 'user')
+			.leftJoinAndSelect('story.categories', 'categories');
 
 		if (search && search.trim()) {
 			applyFuzzySearch(queryBuilder, {
@@ -30,14 +31,28 @@ export class StoryRepository {
 			});
 		}
 
+		if (category && category.trim()) {
+			queryBuilder.innerJoin(
+				'story.categories',
+				'filterCategories',
+				'LOWER(filterCategories.name) LIKE LOWER(:category)',
+				{
+					category: `%${category}%`,
+				},
+			);
+		}
+
 		const orderByField = orderBy ? `story.${orderBy}` : 'story.storyId';
 		buildCursorPaginationQuery(queryBuilder, 'story.storyId', startAfter, limit, orderByField);
 
-		return queryBuilder.getMany();
+		return queryBuilder.distinct(true).getMany();
 	};
 
 	findById = async (id: string): Promise<Story | null> => {
-		return this.repository.findOne({ where: { storyId: id } });
+		return this.repository.findOne({
+			where: { storyId: id },
+			relations: ['categories'],
+		});
 	};
 
 	update = async (id: string, story: Partial<Story>): Promise<Story | null | undefined> => {
@@ -49,5 +64,9 @@ export class StoryRepository {
 	softDelete = async (id: string): Promise<boolean> => {
 		const result = await this.repository.softDelete(id);
 		return result.affected === 1;
+	};
+
+	save = async (story: Story): Promise<Story> => {
+		return this.repository.save(story);
 	};
 }

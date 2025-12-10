@@ -14,10 +14,12 @@ registerDependencies()
 		const userRoutes = require('./routes/userRoutes').default;
 		const storyRoutes = require('./routes/storyRoutes').default;
 		const authRoutes = require('./routes/authRoutes').default;
+		const categoryRoutes = require('./routes/categoryRoutes').default;
 
 		app.use(`/api/v1/users`, userRoutes);
 		app.use(`/api/v1/stories`, storyRoutes);
 		app.use('/api/v1/auth', authRoutes);
+		app.use('/api/v1/categories', categoryRoutes);
 
 		app.use(routeNotFoundHandler);
 		app.use(errorHandler);

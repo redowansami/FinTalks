@@ -3,9 +3,11 @@ import { AppDataSource } from './dataSource';
 import { AuthRepository } from '../repositories/authRepository';
 import { UserRepository } from '../repositories/userRepository';
 import { StoryRepository } from '../repositories/storyRepository';
+import { CategoryRepository } from '../repositories/categoryRepository';
 import { AuthService } from '../services/authService';
 import { UserService } from '../services/userService';
 import { StoryService } from '../services/storyService';
+import { CategoryService } from '../services/categoryService';
 import { TransactionService } from '../services/transactionService';
 import { ENTITY_MANAGER } from '../constants/tokens';
 
@@ -16,8 +18,10 @@ export const registerDependencies = async (): Promise<void> => {
 	container.registerSingleton(AuthRepository);
 	container.registerSingleton(UserRepository);
 	container.registerSingleton(StoryRepository);
+	container.registerSingleton(CategoryRepository);
 	container.registerSingleton(AuthService);
 	container.registerSingleton(UserService);
 	container.registerSingleton(StoryService);
+	container.registerSingleton(CategoryService);
 	container.registerSingleton(TransactionService);
 };

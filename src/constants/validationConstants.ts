@@ -12,6 +12,9 @@ export const LENTGH_CONSTRAINTS = {
 	MAX_LIMIT: 100,
 	EMAIL_MAX: 255,
 	DEFAULT_PAGINATION_LIMIT: 3,
+	CATEGORY_NAME_MIN: 3,
+	CATEGORY_NAME_MAX: 50,
+	DESCRIPTION_MAX: 500,
 };
 
 export const VALIDATION_MESSAGES = {
@@ -35,4 +38,8 @@ export const VALIDATION_MESSAGES = {
 	LOWERCASE_LETTER: 'Password should contain at least one lowercase letter',
 	DIGIT: 'Password should contain at least one digit',
 	SPECIAL_CHARACTER: 'Password should contain at least one special character',
+	CATEGORY_NAME_MIN: 'Category name should be at least 3 characters long',
+	CATEGORY_NAME_MAX: 'Category name must be at most 50 characters',
+	INVALID_CATEGORY_ID: 'Invalid category ID format',
+	DESCRIPTION_MAX: 'Description must be at most 500 characters',
 };
