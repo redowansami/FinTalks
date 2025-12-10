@@ -62,6 +62,7 @@ Content to analyze:
 	private readonly TIMEOUT_MS = env.AI_SUMMARIZATION_TIMEOUT_MS;
 	private readonly API_KEY = env.OPENROUTER_API_KEY;
 	private readonly MODEL = env.OPENROUTER_MODEL;
+	private readonly FALLBACK_MODEL = env.OPENROUTER_FALLBACK_MODEL;
 
 	async generateStorySummary(content: string): Promise<SummarizerResponse> {
 		if (!this.API_KEY) {
@@ -76,6 +77,27 @@ Content to analyze:
 	private async callOpenRouterWithRetry(prompt: string): Promise<SummarizerResponse> {
 		let lastError: unknown = null;
 
+		try {
+			return await this.attemptSummarization(prompt, this.MODEL);
+		} catch (error) {
+			lastError = error;
+		}
+
+		if (this.FALLBACK_MODEL && this.MODEL !== this.FALLBACK_MODEL) {
+			try {
+				console.warn('Primary model failed, attempting fallback model...');
+				return await this.attemptSummarization(prompt, this.FALLBACK_MODEL);
+			} catch (error) {
+				lastError = error;
+			}
+		}
+
+		throw lastError || new Error(AI_ERROR_MESSAGES.SUMMARIZATION_FAILED);
+	}
+
+	private async attemptSummarization(prompt: string, model: string): Promise<SummarizerResponse> {
+		let lastError: unknown = null;
+
 		for (let attempt = 0; attempt < this.MAX_RETRIES; attempt++) {
 			const response = await this.fetchWithTimeout(
 				'https://openrouter.ai/api/v1/chat/completions',
@@ -88,7 +110,7 @@ Content to analyze:
 						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify({
-						model: this.MODEL,
+						model: model,
 						messages: [{ role: 'user', content: prompt }],
 					}),
 				},
