@@ -11,6 +11,11 @@ import {
 	userIdSchema,
 	userQuerySchema,
 } from '../schemas/userSchema';
+import {
+	initiatePasswordChangeSchema,
+	confirmationCodeSchema,
+	confirmPasswordChangeSchema,
+} from '../schemas/authSchema';
 
 const router = Router();
 const userController = container.resolve(UserController);
@@ -23,6 +28,25 @@ router
 		requireAdmin,
 		validateRequest({ body: escalateToAdminSchema }),
 		userController.escalateToAdmin,
+	)
+	.post(
+		'/change-password',
+		requireAuth,
+		validateRequest({ body: initiatePasswordChangeSchema }),
+		userController.initiatePasswordChange,
+	)
+	.post(
+		'/confirm-password-code',
+		requireAuth,
+		validateRequest({ body: confirmationCodeSchema }),
+		userController.confirmPasswordCode,
+	)
+	.post(
+		'/confirm-password-change/:token',
+		validateRequest({
+			body: confirmPasswordChangeSchema,
+		}),
+		userController.confirmPasswordChange,
 	)
 	.get('/:userId', validateRequest({ params: userIdSchema }), userController.findOne)
 	.patch(
