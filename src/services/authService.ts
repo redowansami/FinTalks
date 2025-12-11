@@ -235,7 +235,7 @@ export class AuthService {
 				userId,
 			},
 			JWT_SECRET,
-			{ expiresIn: '15m' },
+			{ expiresIn: PASSWORD_CHANGE_CODE_EXPIRY },
 		);
 
 		return {
