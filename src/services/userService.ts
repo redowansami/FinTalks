@@ -2,7 +2,6 @@ import { UserRepository } from '../repositories/userRepository';
 import { ErrorFactory } from '../errors/errorFactory';
 import {
 	CreateUserDTO,
-	UpdateUserDTO,
 	UserResponseDTO,
 	UserQueryDTO,
 	SignupResponseDTO,
@@ -75,12 +74,6 @@ export class UserService {
 			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 		return transformToDTO(SignupResponseDTO, user);
-	};
-
-	updateUser = async (id: string, updatedData: UpdateUserDTO): Promise<UserResponseDTO> => {
-		await this.getUserById(id);
-		const user = await this.userRepository.update(id, updatedData);
-		return transformToDTO(UserResponseDTO, user);
 	};
 
 	deleteUser = async (id: string): Promise<void> => {
