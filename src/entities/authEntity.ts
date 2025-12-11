@@ -12,6 +12,12 @@ export class Auth {
 	@Column({ type: 'timestamp', nullable: true })
 	passwordLastModificationTime: Date;
 
+	@Column({ type: 'varchar', nullable: true })
+	passwordChangeCode: string | null;
+
+	@Column({ type: 'timestamp', nullable: true })
+	passwordChangeCodeExpiry: Date | null;
+
 	@OneToOne(() => User, {
 		onDelete: 'CASCADE',
 	})
