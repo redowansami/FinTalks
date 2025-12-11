@@ -7,7 +7,6 @@ import { requireRolesUser, requireAdmin } from '../middleware/authorizationMiddl
 import { UserRole } from '../entities/userEntity';
 import {
 	escalateToAdminSchema,
-	updateUserSchema,
 	userIdSchema,
 	userQuerySchema,
 	updateProfileSchema,
@@ -57,13 +56,6 @@ router
 		userController.confirmPasswordChange,
 	)
 	.get('/:userId', validateRequest({ params: userIdSchema }), userController.findOne)
-	.patch(
-		'/:userId',
-		requireAuth,
-		requireRolesUser(),
-		validateRequest({ params: userIdSchema, body: updateUserSchema }),
-		userController.update,
-	)
 	.delete(
 		'/:userId',
 		requireAuth,
