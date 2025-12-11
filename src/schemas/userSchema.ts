@@ -49,3 +49,21 @@ export const emailConfirmationSchema = z
 		isEmailConfirmed: z.boolean(),
 	})
 	.strict();
+
+export const updateProfileSchema = z
+	.object({
+		name: z
+			.string()
+			.min(LENTGH_CONSTRAINTS.NAME_MIN, VALIDATION_MESSAGES.NAME_MIN)
+			.max(LENTGH_CONSTRAINTS.NAME_MAX, VALIDATION_MESSAGES.NAME_MAX)
+			.trim()
+			.optional(),
+		bio: z
+			.string()
+			.max(LENTGH_CONSTRAINTS.BIO_MAX, VALIDATION_MESSAGES.BIO_MAX)
+			.trim()
+			.optional()
+			.nullable(),
+		profilePictureUrl: z.url(VALIDATION_MESSAGES.INVALID_URL).trim().optional().nullable(),
+	})
+	.strict();
