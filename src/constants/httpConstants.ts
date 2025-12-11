@@ -48,4 +48,9 @@ export const HTTP_MESSAGES = {
 	CATEGORY_NOT_FOUND: 'Category not found',
 	INVALID_CATEGORIES: 'One or more categories do not exist',
 	SEEDED_SUCCESSFULLY: 'Categories seeded successfully',
+	PASSWORD_CHANGE_EMAIL_SENT: 'Password change confirmation code sent to your email',
+	PASSWORD_CHANGE_CODE_INVALID: 'Invalid or expired password change code',
+	PASSWORD_CHANGE_CODE_VERIFIED: 'Password change code verified successfully',
+	PASSWORD_CHANGED_SUCCESSFULLY: 'Password changed successfully',
+	CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect',
 };

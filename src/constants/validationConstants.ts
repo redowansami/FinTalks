@@ -15,6 +15,7 @@ export const LENTGH_CONSTRAINTS = {
 	CATEGORY_NAME_MIN: 3,
 	CATEGORY_NAME_MAX: 50,
 	DESCRIPTION_MAX: 500,
+	CODE_LENGTH: 6,
 };
 
 export const VALIDATION_MESSAGES = {
@@ -42,4 +43,5 @@ export const VALIDATION_MESSAGES = {
 	CATEGORY_NAME_MAX: 'Category name must be at most 50 characters',
 	INVALID_CATEGORY_ID: 'Invalid category ID format',
 	DESCRIPTION_MAX: 'Description must be at most 500 characters',
+	CODE_LENGTH: 'Confirmation code is atleast 6 characters long',
 };

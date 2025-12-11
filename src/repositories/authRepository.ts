@@ -30,4 +30,26 @@ export class AuthRepository {
 		await this.repository.update(authId, data);
 		return this.repository.findOne({ where: { authId } });
 	};
+
+	updatePasswordChangeCode = async (
+		authId: string,
+		code: string,
+		expiryTime: Date,
+	): Promise<Auth | null> => {
+		await this.repository.update(authId, {
+			passwordChangeCode: code,
+			passwordChangeCodeExpiry: expiryTime,
+		});
+		return this.repository.findOne({ where: { authId } });
+	};
+
+	updatePassword = async (authId: string, hashedPassword: string): Promise<Auth | null> => {
+		await this.repository.update(authId, {
+			hashedPassword,
+			passwordLastModificationTime: new Date(),
+			passwordChangeCode: null,
+			passwordChangeCodeExpiry: null,
+		});
+		return this.repository.findOne({ where: { authId } });
+	};
 }
