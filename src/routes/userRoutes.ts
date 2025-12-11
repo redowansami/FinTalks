@@ -10,6 +10,7 @@ import {
 	updateUserSchema,
 	userIdSchema,
 	userQuerySchema,
+	updateProfileSchema,
 } from '../schemas/userSchema';
 import {
 	initiatePasswordChangeSchema,
@@ -22,6 +23,13 @@ const userController = container.resolve(UserController);
 
 router
 	.get('/', validateRequest({ query: userQuerySchema }), userController.findAll)
+	.get('/profile', requireAuth, userController.getProfile)
+	.patch(
+		'/profile',
+		requireAuth,
+		validateRequest({ body: updateProfileSchema }),
+		userController.updateProfile,
+	)
 	.patch(
 		'/escalate-to-admin',
 		requireAuth,
