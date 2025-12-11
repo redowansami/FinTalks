@@ -177,7 +177,7 @@ export class AuthService {
 		const code = crypto.randomInt(100000, 999999).toString();
 		const expiryTime = new Date(Date.now() + PASSWORD_CHANGE_CODE_EXPIRY * 1000);
 
-		await this.authRepository.validatePasswordChangeCode(authRow.authId, code, expiryTime);
+		await this.authRepository.updatePasswordChangeCode(authRow.authId, code, expiryTime);
 
 		await this.sendPasswordChangeEmail(userRaw.email, code);
 

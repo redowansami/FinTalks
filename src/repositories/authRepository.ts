@@ -31,7 +31,7 @@ export class AuthRepository {
 		return this.repository.findOne({ where: { authId } });
 	};
 
-	validatePasswordChangeCode = async (
+	updatePasswordChangeCode = async (
 		authId: string,
 		code: string,
 		expiryTime: Date,
