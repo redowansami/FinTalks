@@ -2,14 +2,12 @@ import { z } from 'zod';
 import { Expose } from 'class-transformer';
 import {
 	createUserSchema,
-	updateUserSchema,
 	userIdSchema,
 	userQuerySchema,
 	updateProfileSchema,
 } from '../schemas/userSchema';
 
 export type CreateUserDTO = z.infer<typeof createUserSchema>;
-export type UpdateUserDTO = z.infer<typeof updateUserSchema>;
 export type UserIdDTO = z.infer<typeof userIdSchema>;
 export type UserQueryDTO = z.infer<typeof userQuerySchema>;
 export type UpdateProfileDTO = z.infer<typeof updateProfileSchema>;

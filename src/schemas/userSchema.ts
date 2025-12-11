@@ -22,8 +22,6 @@ export const createUserSchema = z
 	})
 	.strict();
 
-export const updateUserSchema = createUserSchema.partial().omit({ username: true, email: true });
-
 export const userIdSchema = z.object({ userId: z.uuid('Invalid user ID format') });
 
 export const userQuerySchema = z.object({
