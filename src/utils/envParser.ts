@@ -28,4 +28,5 @@ export const env = {
 		process.env.OPENROUTER_FALLBACK_MODEL || 'meta-llama/llama-2-7b-chat',
 	AI_SUMMARIZATION_TIMEOUT_MS: parseInt(process.env.AI_SUMMARIZATION_TIMEOUT_MS || '30000'),
 	AI_SUMMARIZATION_MAX_RETRIES: parseInt(process.env.AI_SUMMARIZATION_MAX_RETRIES || '3'),
+	PASSWORD_CHANGE_CODE_EXPIRY: Number(process.env.PASSWORD_CHANGE_CODE_EXPIRY || '900'),
 };
