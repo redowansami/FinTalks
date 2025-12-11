@@ -39,6 +39,12 @@ export class User {
 	@Column({ type: 'boolean', default: false })
 	isEmailConfirmed: boolean;
 
+	@Column({ type: 'text', nullable: true })
+	bio: string | null;
+
+	@Column({ type: 'varchar', length: 500, nullable: true })
+	profilePictureUrl: string | null;
+
 	@DeleteDateColumn({ type: 'timestamp', nullable: true })
 	deletedAt: Date | null;
 }
