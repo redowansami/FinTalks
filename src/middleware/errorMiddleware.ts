@@ -3,6 +3,7 @@ import { ValidationError } from '../errors/customErrors';
 import { AppError } from '../errors/appError';
 import { handleDatabaseError } from '../utils/errorUtils';
 import { HTTP_MESSAGES, HTTP_STATUS } from '../constants/httpConstants';
+import { AI_ERROR_MESSAGES } from '../constants/aiConstants';
 import { env } from '../utils/envParser';
 import jwt from 'jsonwebtoken';
 
@@ -72,13 +73,57 @@ export const errorHandler = (
 		return res.status(dbError.statusCode).json(response);
 	}
 
+	if (err instanceof Error) {
+		if (err.message.includes('Failed to parse JSON response')) {
+			const response: ErrorResponsePayload = {
+				success: false,
+				message: AI_ERROR_MESSAGES.JSON_PARSE_FAILED,
+			};
+
+			if (isDevelopment) {
+				response.stack = err.stack;
+			}
+
+			console.error('JSON Parse Error:', err);
+			return res.status(HTTP_STATUS.INTERNAL_ERROR).json(response);
+		}
+
+		if (err.message.includes('Rate limited')) {
+			const response: ErrorResponsePayload = {
+				success: false,
+				message: AI_ERROR_MESSAGES.RATE_LIMITED,
+			};
+
+			if (isDevelopment) {
+				response.stack = err.stack;
+			}
+
+			console.error('AI Rate Limit Error:', err);
+			return res.status(HTTP_STATUS.TOO_MANY_REQUESTS).json(response);
+		}
+
+		if (err.message.includes('OpenRouter') || err.message.includes('API')) {
+			const response: ErrorResponsePayload = {
+				success: false,
+				message: AI_ERROR_MESSAGES.SUMMARIZATION_FAILED,
+			};
+
+			if (isDevelopment) {
+				response.stack = err.stack;
+			}
+
+			console.error('OpenRouter API Error:', err);
+			return res.status(HTTP_STATUS.SERVICE_UNAVAILABLE).json(response);
+		}
+	}
+
 	const response: ErrorResponsePayload = {
 		success: false,
 		message: HTTP_MESSAGES.INTERNAL_ERROR,
 	};
 
 	if (isDevelopment) {
-		response.message = err.message || 'Unknown error';
+		response.message = err.message || AI_ERROR_MESSAGES.UNKNOWN_ERROR;
 		response.stack = err.stack;
 	}
 

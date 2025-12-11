@@ -8,6 +8,7 @@ import { transformToDTO } from '../utils/mapper';
 import { getPaginatedResults } from '../utils/cursorPaginationHelper';
 import { injectable } from 'tsyringe';
 import { Category } from 'entities/categoryEntity';
+import summarizerService from './summarizerService';
 
 @injectable()
 export class StoryService {
@@ -30,12 +31,25 @@ export class StoryService {
 		await this.storyRepository.save(story);
 	};
 
+	private saveSummary = async (story: Story, summarizerResponse: any): Promise<void> => {
+		story.summary = summarizerResponse.summary;
+		story.reliabilityScore = summarizerResponse.reliabilityScore;
+		story.predictionComparison = summarizerResponse.comparison;
+		story.summaryUpdatedAt = new Date();
+
+		await this.storyRepository.save(story);
+	};
+
 	createStory = async (data: CreateStoryDTO): Promise<StoryResponseDTO> => {
+		const summarizerResponse = await summarizerService.generateStorySummary(data.body);
+
 		const story = await this.storyRepository.create(data);
 
 		if (data.categoryIds) {
 			await this.attachCategories(story, data.categoryIds);
 		}
+
+		await this.saveSummary(story, summarizerResponse);
 
 		return transformToDTO(StoryResponseDTO, story);
 	};
@@ -60,9 +74,16 @@ export class StoryService {
 	};
 
 	updateStory = async (id: string, updatedData: UpdateStoryDTO): Promise<StoryResponseDTO> => {
-		await this.getStoryById(id);
+		const existingStory = await this.getStoryById(id);
 
 		const { categoryIds, ...storyData } = updatedData;
+
+		const bodyChanged = storyData.body && storyData.body !== existingStory.body;
+
+		let summarizerResponse = null;
+		if (bodyChanged) {
+			summarizerResponse = await summarizerService.generateStorySummary(storyData.body!);
+		}
 
 		await this.storyRepository.update(id, storyData);
 
@@ -73,6 +94,10 @@ export class StoryService {
 		const updatedStory = await this.storyRepository.findById(id);
 		if (!updatedStory) {
 			throw ErrorFactory.notFound(HTTP_MESSAGES.STORY_NOT_FOUND);
+		}
+
+		if (summarizerResponse && bodyChanged) {
+			await this.saveSummary(updatedStory, summarizerResponse);
 		}
 
 		return transformToDTO(StoryResponseDTO, updatedStory);

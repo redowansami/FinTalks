@@ -36,6 +36,18 @@ export class Story {
 	@DeleteDateColumn({ type: 'timestamp', nullable: true })
 	deletedAt: Date | null;
 
+	@Column({ type: 'text', nullable: true })
+	summary: string | null;
+
+	@Column({ type: 'smallint', nullable: true })
+	reliabilityScore: number | null;
+
+	@Column({ type: 'text', nullable: true })
+	predictionComparison: string | null;
+
+	@CreateDateColumn({ nullable: true })
+	summaryUpdatedAt: Date | null;
+
 	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'userId' })
 	userByUserId: User;

@@ -22,4 +22,10 @@ export const env = {
 	BACKEND_URL: process.env.BACKEND_URL || 'http://localhost:3000',
 	EMAIL_TOKEN_SECRET: process.env.EMAIL_TOKEN_SECRET || 'email_token_secret',
 	EMAIL_TOKEN_EXPIRES_IN: process.env.EMAIL_TOKEN_EXPIRES_IN || '24h',
+	OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || '',
+	OPENROUTER_MODEL: process.env.OPENROUTER_MODEL || 'openai/gpt-4o',
+	OPENROUTER_FALLBACK_MODEL:
+		process.env.OPENROUTER_FALLBACK_MODEL || 'meta-llama/llama-2-7b-chat',
+	AI_SUMMARIZATION_TIMEOUT_MS: parseInt(process.env.AI_SUMMARIZATION_TIMEOUT_MS || '30000'),
+	AI_SUMMARIZATION_MAX_RETRIES: parseInt(process.env.AI_SUMMARIZATION_MAX_RETRIES || '3'),
 };

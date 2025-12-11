@@ -20,5 +20,9 @@ export class StoryResponseDTO {
 	@Expose() body: string;
 	@Expose() createdAt: Date;
 	@Expose() updatedAt: Date;
+	@Expose() summary?: string | null;
+	@Expose() reliabilityScore?: number | null;
+	@Expose() predictionComparison?: string | null;
+	@Expose() summaryUpdatedAt?: Date | null;
 	@Expose() @Type(() => CategoryResponseDTO) categories?: CategoryResponseDTO[];
 }
