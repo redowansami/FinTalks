@@ -43,14 +43,6 @@ export class AuthRepository {
 		return this.repository.findOne({ where: { authId } });
 	};
 
-	clearPasswordChangeCode = async (authId: string): Promise<Auth | null> => {
-		await this.repository.update(authId, {
-			passwordChangeCode: null,
-			passwordChangeCodeExpiry: null,
-		});
-		return this.repository.findOne({ where: { authId } });
-	};
-
 	updatePassword = async (authId: string, hashedPassword: string): Promise<Auth | null> => {
 		await this.repository.update(authId, {
 			hashedPassword,
