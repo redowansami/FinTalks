@@ -29,17 +29,6 @@ export class UserController {
 		res.status(HTTP_STATUS.OK).json({ success: true, user });
 	};
 
-	update = async (req: Request, res: Response): Promise<void> => {
-		const userId = req.params.userId;
-		const user = await this.userService.updateUser(userId, req.body);
-
-		res.status(HTTP_STATUS.OK).json({
-			success: true,
-			message: HTTP_MESSAGES.USER_UPDATED,
-			user,
-		});
-	};
-
 	delete = async (req: Request, res: Response): Promise<void> => {
 		const userId = req.params.userId;
 		await this.userService.deleteUser(userId);
