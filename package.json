@@ -4,7 +4,7 @@
   "description": "FinTalks is a financial blog platform for finance enthusiasts to share experiences, predictions, and investment insights.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --coverage",
     "dev": "nodemon --watch './**/*.ts' --exec ts-node src/index.ts",
     "lint": "eslint 'src/**/*.{ts,tsx}' --fix",
     "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,json,md,mjs,css}'",
@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.5",
+    "@types/jest": "^30.0.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "@typescript-eslint/eslint-plugin": "^8.47.0",
@@ -63,7 +64,9 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "husky": "^9.1.7",
+    "jest": "^30.2.0",
     "lint-staged": "^16.2.6",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.6"
   }
 }
