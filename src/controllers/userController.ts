@@ -29,17 +29,6 @@ export class UserController {
 		res.status(HTTP_STATUS.OK).json({ success: true, user });
 	};
 
-	update = async (req: Request, res: Response): Promise<void> => {
-		const userId = req.params.userId;
-		const user = await this.userService.updateUser(userId, req.body);
-
-		res.status(HTTP_STATUS.OK).json({
-			success: true,
-			message: HTTP_MESSAGES.USER_UPDATED,
-			user,
-		});
-	};
-
 	delete = async (req: Request, res: Response): Promise<void> => {
 		const userId = req.params.userId;
 		await this.userService.deleteUser(userId);
@@ -98,6 +87,28 @@ export class UserController {
 			success: true,
 			message: result.message,
 			token: result.token,
+		});
+	};
+
+	getProfile = async (req: Request & { user?: User }, res: Response): Promise<void> => {
+		const userId = req.user!.userId;
+		const profile = await this.userService.getProfile(userId);
+
+		res.status(HTTP_STATUS.OK).json({
+			success: true,
+			message: HTTP_MESSAGES.PROFILE_FETCHED_SUCCESSFULLY,
+			profile,
+		});
+	};
+
+	updateProfile = async (req: Request & { user?: User }, res: Response): Promise<void> => {
+		const userId = req.user!.userId;
+		const profile = await this.userService.updateProfile(userId, req.body);
+
+		res.status(HTTP_STATUS.OK).json({
+			success: true,
+			message: HTTP_MESSAGES.PROFILE_UPDATED_SUCCESSFULLY,
+			profile,
 		});
 	};
 }

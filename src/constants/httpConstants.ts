@@ -53,4 +53,6 @@ export const HTTP_MESSAGES = {
 	PASSWORD_CHANGE_CODE_VERIFIED: 'Password change code verified successfully',
 	PASSWORD_CHANGED_SUCCESSFULLY: 'Password changed successfully',
 	CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect',
+	PROFILE_FETCHED_SUCCESSFULLY: 'Profile fetched successfully',
+	PROFILE_UPDATED_SUCCESSFULLY: 'Profile updated successfully',
 };

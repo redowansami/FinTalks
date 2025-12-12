@@ -2,10 +2,11 @@ import { UserRepository } from '../repositories/userRepository';
 import { ErrorFactory } from '../errors/errorFactory';
 import {
 	CreateUserDTO,
-	UpdateUserDTO,
 	UserResponseDTO,
 	UserQueryDTO,
 	SignupResponseDTO,
+	GetProfileDTO,
+	UpdateProfileDTO,
 } from '../dtos/userDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
@@ -75,12 +76,6 @@ export class UserService {
 		return transformToDTO(SignupResponseDTO, user);
 	};
 
-	updateUser = async (id: string, updatedData: UpdateUserDTO): Promise<UserResponseDTO> => {
-		await this.getUserById(id);
-		const user = await this.userRepository.update(id, updatedData);
-		return transformToDTO(UserResponseDTO, user);
-	};
-
 	deleteUser = async (id: string): Promise<void> => {
 		await this.getUserById(id);
 		await this.userRepository.softDelete(id);
@@ -94,5 +89,23 @@ export class UserService {
 
 	confirmEmailAddress = async (id: string): Promise<void> => {
 		await this.userRepository.update(id, { isEmailConfirmed: true });
+	};
+
+	getProfile = async (userId: string): Promise<GetProfileDTO> => {
+		const user = await this.userRepository.findById(userId);
+		if (!user) {
+			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+		}
+		return transformToDTO(GetProfileDTO, user);
+	};
+
+	updateProfile = async (userId: string, data: UpdateProfileDTO): Promise<GetProfileDTO> => {
+		const user = await this.userRepository.findById(userId);
+		if (!user) {
+			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+		}
+
+		const updatedUser = await this.userRepository.update(userId, data);
+		return transformToDTO(GetProfileDTO, updatedUser);
 	};
 }

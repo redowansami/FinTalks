@@ -22,8 +22,6 @@ export const createUserSchema = z
 	})
 	.strict();
 
-export const updateUserSchema = createUserSchema.partial().omit({ username: true, email: true });
-
 export const userIdSchema = z.object({ userId: z.uuid('Invalid user ID format') });
 
 export const userQuerySchema = z.object({
@@ -47,5 +45,23 @@ export const escalateToAdminSchema = z
 export const emailConfirmationSchema = z
 	.object({
 		isEmailConfirmed: z.boolean(),
+	})
+	.strict();
+
+export const updateProfileSchema = z
+	.object({
+		name: z
+			.string()
+			.min(LENTGH_CONSTRAINTS.NAME_MIN, VALIDATION_MESSAGES.NAME_MIN)
+			.max(LENTGH_CONSTRAINTS.NAME_MAX, VALIDATION_MESSAGES.NAME_MAX)
+			.trim()
+			.optional(),
+		bio: z
+			.string()
+			.max(LENTGH_CONSTRAINTS.BIO_MAX, VALIDATION_MESSAGES.BIO_MAX)
+			.trim()
+			.optional()
+			.nullable(),
+		profilePictureUrl: z.url(VALIDATION_MESSAGES.INVALID_URL).trim().optional().nullable(),
 	})
 	.strict();
