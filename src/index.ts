@@ -3,9 +3,13 @@ import express from 'express';
 import { registerDependencies } from './config/dependencyContainer';
 import { errorHandler, routeNotFoundHandler } from './middleware/errorMiddleware';
 import { env } from './utils/envParser';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './api-docs/swagger';
 
 const PORT = env.PORT;
 const app = express();
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(express.json());
 
