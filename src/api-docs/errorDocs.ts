@@ -49,7 +49,7 @@
  *           example: false
  *         message:
  *           type: string
- *           example: "Bad Request"
+ *           example: "Validation Error/Bad Request"
  *       required:
  *         - success
  *         - message
