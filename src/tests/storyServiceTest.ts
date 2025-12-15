@@ -23,7 +23,6 @@ describe('StoryService', () => {
 	let mockStoryRepository: jest.Mocked<StoryRepository>;
 	let mockCategoryService: jest.Mocked<CategoryService>;
 
-	// Mock entities with proper types
 	const mockCategory: Category = {
 		categoryId: 'cat-123',
 		name: 'Finance',
@@ -83,7 +82,6 @@ describe('StoryService', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 
-		// Setup mock repository
 		mockStoryRepository = {
 			create: jest.fn(),
 			findAll: jest.fn(),
@@ -93,18 +91,15 @@ describe('StoryService', () => {
 			save: jest.fn(),
 		} as unknown as jest.Mocked<StoryRepository>;
 
-		// Setup mock category service
 		mockCategoryService = {
 			getCategoriesByIds: jest.fn(),
 		} as unknown as jest.Mocked<CategoryService>;
 
 		storyService = new StoryService(mockStoryRepository, mockCategoryService);
 
-		// Setup error factory mocks
 		(ErrorFactory.conflict as jest.Mock).mockImplementation((msg: string) => new Error(msg));
 		(ErrorFactory.notFound as jest.Mock).mockImplementation((msg: string) => new Error(msg));
 
-		// Mock transformToDTO to return mockStoryResponseDTO for all calls
 		(transformToDTO as jest.Mock).mockReturnValue(mockStoryResponseDTO);
 	});
 
@@ -142,7 +137,6 @@ describe('StoryService', () => {
 			expect(mockStoryRepository.create).toHaveBeenCalledWith(createStoryData);
 			expect(mockCategoryService.getCategoriesByIds).toHaveBeenCalledWith(['cat-123']);
 			expect(mockStoryRepository.save).toHaveBeenCalled();
-			// Check that transformToDTO was called with StoryResponseDTO and a story with the expected properties
 			expect(transformToDTO).toHaveBeenCalledWith(
 				StoryResponseDTO,
 				expect.objectContaining({
@@ -204,7 +198,7 @@ describe('StoryService', () => {
 			(mockStoryRepository.create as jest.Mock).mockResolvedValueOnce(storyEntity);
 			(mockCategoryService.getCategoriesByIds as jest.Mock).mockResolvedValueOnce([
 				mockCategory,
-			]); // Returns only 1 instead of 2
+			]);
 
 			const mockError = new Error(HTTP_MESSAGES.INVALID_CATEGORIES);
 			(ErrorFactory.conflict as jest.Mock).mockReturnValueOnce(mockError);
@@ -287,9 +281,7 @@ describe('StoryService', () => {
 
 			const result: StoryResponseDTO = await storyService.createStory(createStoryData);
 
-			// getCategoriesByIds should not be called when categoryIds array is empty (early return)
 			expect(mockCategoryService.getCategoriesByIds).not.toHaveBeenCalled();
-			// save should only be called once for summary, not for categories
 			expect(mockStoryRepository.save).toHaveBeenCalledTimes(1);
 			expect(result).toBeDefined();
 		});
@@ -371,7 +363,6 @@ describe('StoryService', () => {
 				startAfter: null as any,
 			};
 
-			// Capture the callback function passed to getPaginatedResults
 			let callbackFunction: ((params: StoryQueryDTO) => Promise<Story[]>) | undefined;
 			(getPaginatedResults as jest.Mock).mockImplementation((params, callback) => {
 				callbackFunction = callback;
@@ -382,7 +373,6 @@ describe('StoryService', () => {
 
 			await storyService.findAllStories(queryParams);
 
-			// Verify the callback was passed and execute it
 			expect(callbackFunction).toBeDefined();
 			const result = await callbackFunction!(queryParams);
 			expect(mockStoryRepository.findAll).toHaveBeenCalledWith(queryParams);
@@ -438,8 +428,8 @@ describe('StoryService', () => {
 			};
 
 			(mockStoryRepository.findById as jest.Mock)
-				.mockResolvedValueOnce(mockStory) // for getStoryById
-				.mockResolvedValueOnce(updatedStory); // for final fetch
+				.mockResolvedValueOnce(mockStory)
+				.mockResolvedValueOnce(updatedStory);
 
 			(mockStoryRepository.update as jest.Mock).mockResolvedValueOnce(updatedStory);
 			(transformToDTO as jest.Mock).mockReturnValueOnce(mockStoryResponseDTO);
@@ -503,9 +493,9 @@ describe('StoryService', () => {
 			};
 
 			(mockStoryRepository.findById as jest.Mock)
-				.mockResolvedValueOnce(mockStory) // getStoryById
-				.mockResolvedValueOnce(mockStory) // addCategoriesToStory - check if story exists
-				.mockResolvedValueOnce(storyWithNewCategories); // final fetch
+				.mockResolvedValueOnce(mockStory)
+				.mockResolvedValueOnce(mockStory)
+				.mockResolvedValueOnce(storyWithNewCategories);
 
 			(mockStoryRepository.update as jest.Mock).mockResolvedValueOnce(storyWithNewCategories);
 			(mockCategoryService.getCategoriesByIds as jest.Mock).mockResolvedValueOnce([
@@ -553,7 +543,7 @@ describe('StoryService', () => {
 			(mockStoryRepository.update as jest.Mock).mockResolvedValueOnce(mockStory);
 			(mockCategoryService.getCategoriesByIds as jest.Mock).mockResolvedValueOnce([
 				mockCategory,
-			]); // Only 1 instead of 2
+			]);
 
 			const mockError = new Error(HTTP_MESSAGES.INVALID_CATEGORIES);
 			(ErrorFactory.conflict as jest.Mock).mockReturnValueOnce(mockError);
@@ -569,8 +559,8 @@ describe('StoryService', () => {
 			};
 
 			(mockStoryRepository.findById as jest.Mock)
-				.mockResolvedValueOnce(mockStory) // for getStoryById - succeeds
-				.mockResolvedValueOnce(null); // for final fetch - returns null
+				.mockResolvedValueOnce(mockStory)
+				.mockResolvedValueOnce(null);
 
 			(mockStoryRepository.update as jest.Mock).mockResolvedValueOnce(mockStory);
 
@@ -581,7 +571,6 @@ describe('StoryService', () => {
 				HTTP_MESSAGES.STORY_NOT_FOUND,
 			);
 
-			// Verify that update was called before the error was thrown
 			expect(mockStoryRepository.update).toHaveBeenCalledWith('story-123', {
 				title: 'Updated Title',
 			});
@@ -618,7 +607,6 @@ describe('StoryService', () => {
 
 			await storyService.deleteStory('story-123');
 
-			// Verify findById was called first
 			expect(mockStoryRepository.findById).toHaveBeenCalledTimes(1);
 			expect(mockStoryRepository.softDelete).toHaveBeenCalledTimes(1);
 		});
@@ -662,7 +650,7 @@ describe('StoryService', () => {
 
 		it('should throw ConflictError when category ids are invalid', async () => {
 			(mockStoryRepository.findById as jest.Mock).mockResolvedValueOnce(mockStory);
-			(mockCategoryService.getCategoriesByIds as jest.Mock).mockResolvedValueOnce([]); // No categories found
+			(mockCategoryService.getCategoriesByIds as jest.Mock).mockResolvedValueOnce([]);
 
 			const mockError = new Error(HTTP_MESSAGES.INVALID_CATEGORIES);
 			(ErrorFactory.conflict as jest.Mock).mockReturnValueOnce(mockError);
@@ -726,7 +714,6 @@ describe('StoryService', () => {
 				'cat-456',
 			]);
 
-			// When categories is null, the || [] kicks in, merging with new categories
 			const savedStory: Story = (mockStoryRepository.save as jest.Mock).mock.calls[0][0];
 			expect(savedStory.categories).toHaveLength(1);
 			expect(savedStory.categories[0].categoryId).toBe('cat-456');

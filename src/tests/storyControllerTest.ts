@@ -30,7 +30,7 @@ describe('StoryController', () => {
 			body: {},
 			params: {},
 			user: undefined,
-			validatedReq: {}, // Mock validatedReq from globals
+			validatedReq: {},
 		};
 
 		mockRes = {

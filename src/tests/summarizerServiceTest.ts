@@ -319,7 +319,6 @@ describe('SummarizerService', () => {
 
 		it('should handle fetch abort signal', async () => {
 			(global.fetch as jest.Mock).mockImplementation((url, options) => {
-				// Check if signal is passed
 				expect(options.signal).toBeDefined();
 				return Promise.resolve({
 					json: jest.fn().mockResolvedValue({
@@ -543,10 +542,10 @@ describe('SummarizerService', () => {
 
 			const promise = summarizerService.generateStorySummary('test content');
 
-			await jest.advanceTimersByTimeAsync(1000); // 1st retry
-			await jest.advanceTimersByTimeAsync(2000); // 2nd retry
-			await jest.advanceTimersByTimeAsync(4000); // 3rd retry
-			await jest.advanceTimersByTimeAsync(8000); // 4th retry
+			await jest.advanceTimersByTimeAsync(1000);
+			await jest.advanceTimersByTimeAsync(2000);
+			await jest.advanceTimersByTimeAsync(4000);
+			await jest.advanceTimersByTimeAsync(8000);
 
 			const result = await promise;
 
@@ -687,11 +686,9 @@ describe('SummarizerService', () => {
 		});
 
 		it('should skip fallback when FALLBACK_MODEL equals MODEL', async () => {
-			// Store original values
 			const originalModel = (summarizerService as any).MODEL;
 			const originalFallbackModel = (summarizerService as any).FALLBACK_MODEL;
 
-			// Set both to the same model
 			(summarizerService as any).MODEL = 'same-model';
 			(summarizerService as any).FALLBACK_MODEL = 'same-model';
 
@@ -702,27 +699,22 @@ describe('SummarizerService', () => {
 				'Model failed',
 			);
 
-			// Should only call once since fallback is same as primary
 			expect(attemptSpy).toHaveBeenCalledTimes(1);
 
 			attemptSpy.mockRestore();
 
-			// Restore original values
 			(summarizerService as any).MODEL = originalModel;
 			(summarizerService as any).FALLBACK_MODEL = originalFallbackModel;
 		});
 
 		it('should throw SUMMARIZATION_FAILED when lastError is falsy', async () => {
-			// Store original values
 			const originalModel = (summarizerService as any).MODEL;
 			const originalFallbackModel = (summarizerService as any).FALLBACK_MODEL;
 
-			// Set both to the same model to skip fallback logic
 			(summarizerService as any).MODEL = 'same-model';
 			(summarizerService as any).FALLBACK_MODEL = 'same-model';
 
 			const attemptSpy = jest.spyOn(summarizerService as any, 'attemptSummarization');
-			// Reject with a falsy value (null, undefined, 0, false, etc.)
 			attemptSpy.mockRejectedValueOnce(null);
 
 			await expect(summarizerService.generateStorySummary('test content')).rejects.toThrow(
@@ -731,7 +723,6 @@ describe('SummarizerService', () => {
 
 			attemptSpy.mockRestore();
 
-			// Restore original values
 			(summarizerService as any).MODEL = originalModel;
 			(summarizerService as any).FALLBACK_MODEL = originalFallbackModel;
 		});
