@@ -1,6 +1,6 @@
 import { CategoryRepository } from '../repositories/categoryRepository';
 import { CreateCategoryDTO, UpdateCategoryDTO, CategoryResponseDTO } from '../dtos/categoryDTO';
-import { ErrorFactory } from '../errors/errorFactory';
+import { notFoundCreator, conflictCreator } from '../errors/errorFactory';
 import { transformToDTO } from '../utils/mapper';
 import { injectable } from 'tsyringe';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
@@ -12,7 +12,7 @@ export class CategoryService {
 	createCategory = async (data: CreateCategoryDTO): Promise<CategoryResponseDTO> => {
 		const isNameExists = await this.categoryRepository.findByName(data.name);
 		if (isNameExists) {
-			throw ErrorFactory.conflict(HTTP_MESSAGES.CATEGORY_EXISTS);
+			throw conflictCreator.create(HTTP_MESSAGES.CATEGORY_EXISTS);
 		}
 
 		const category = await this.categoryRepository.create(data);
@@ -27,7 +27,7 @@ export class CategoryService {
 	getCategoryById = async (categoryId: string): Promise<CategoryResponseDTO> => {
 		const category = await this.categoryRepository.findById(categoryId);
 		if (!category) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.CATEGORY_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.CATEGORY_NOT_FOUND);
 		}
 		return transformToDTO(CategoryResponseDTO, category);
 	};
@@ -38,13 +38,13 @@ export class CategoryService {
 	): Promise<CategoryResponseDTO> => {
 		const category = await this.categoryRepository.findById(categoryId);
 		if (!category) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.CATEGORY_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.CATEGORY_NOT_FOUND);
 		}
 
 		if (data.name && data.name !== category.name) {
 			const isNameExists = await this.categoryRepository.findByName(data.name);
 			if (isNameExists) {
-				throw ErrorFactory.conflict(HTTP_MESSAGES.CATEGORY_EXISTS);
+				throw conflictCreator.create(HTTP_MESSAGES.CATEGORY_EXISTS);
 			}
 		}
 
@@ -55,7 +55,7 @@ export class CategoryService {
 	deleteCategory = async (categoryId: string): Promise<{ message: string }> => {
 		const category = await this.categoryRepository.findById(categoryId);
 		if (!category) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.CATEGORY_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.CATEGORY_NOT_FOUND);
 		}
 
 		await this.categoryRepository.delete(categoryId);

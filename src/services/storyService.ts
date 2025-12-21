@@ -1,7 +1,7 @@
 import { Story } from '../entities/storyEntity';
 import { StoryRepository } from '../repositories/storyRepository';
 import { CategoryService } from './categoryService';
-import { ErrorFactory } from '../errors/errorFactory';
+import { conflictCreator, notFoundCreator } from '../errors/errorFactory';
 import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO, StoryQueryDTO } from '../dtos/storyDTO';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { transformToDTO } from '../utils/mapper';
@@ -24,7 +24,7 @@ export class StoryService {
 
 		const categories = await this.categoryService.getCategoriesByIds(categoryIds);
 		if (categories.length !== categoryIds.length) {
-			throw ErrorFactory.conflict(HTTP_MESSAGES.INVALID_CATEGORIES);
+			throw conflictCreator.create(HTTP_MESSAGES.INVALID_CATEGORIES);
 		}
 
 		story.categories = categories as Category[];
@@ -68,7 +68,7 @@ export class StoryService {
 	getStoryById = async (id: string): Promise<StoryResponseDTO> => {
 		const story: Story | null = await this.storyRepository.findById(id);
 		if (!story) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.STORY_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.STORY_NOT_FOUND);
 		}
 		return transformToDTO(StoryResponseDTO, story);
 	};
@@ -93,7 +93,7 @@ export class StoryService {
 
 		const updatedStory = await this.storyRepository.findById(id);
 		if (!updatedStory) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.STORY_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.STORY_NOT_FOUND);
 		}
 
 		if (summarizerResponse && bodyChanged) {
@@ -114,12 +114,12 @@ export class StoryService {
 	): Promise<StoryResponseDTO> => {
 		const story = await this.storyRepository.findById(storyId);
 		if (!story) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.STORY_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.STORY_NOT_FOUND);
 		}
 
 		const newCategories = await this.categoryService.getCategoriesByIds(categoryIds);
 		if (newCategories.length !== categoryIds.length) {
-			throw ErrorFactory.conflict(HTTP_MESSAGES.INVALID_CATEGORIES);
+			throw conflictCreator.create(HTTP_MESSAGES.INVALID_CATEGORIES);
 		}
 
 		story.categories = [...(story.categories || []), ...(newCategories as Category[])];
@@ -134,7 +134,7 @@ export class StoryService {
 	): Promise<StoryResponseDTO> => {
 		const story = await this.storyRepository.findById(storyId);
 		if (!story) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.STORY_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.STORY_NOT_FOUND);
 		}
 
 		story.categories = (story.categories || []).filter((cat) => cat.categoryId !== categoryId);

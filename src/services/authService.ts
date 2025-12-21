@@ -5,7 +5,12 @@ import {
 	InitiatePasswordChangeDTO,
 	ConfirmPasswordChangeDTO,
 } from '../dtos/authDTO';
-import { ErrorFactory } from '../errors/errorFactory';
+import {
+	notFoundCreator,
+	unauthorizedCreator,
+	forbiddenCreator,
+	conflictCreator,
+} from '../errors/errorFactory';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -40,12 +45,12 @@ export class AuthService {
 		await this.transactionService.execute(async (authRepo, userRepo) => {
 			const isUsernameFound = await userRepo.findByUsername(data.username);
 			if (isUsernameFound) {
-				throw ErrorFactory.conflict(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS);
+				throw conflictCreator.create(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS);
 			}
 
 			const isEmailFound = await userRepo.findByEmail(data.email);
 			if (isEmailFound) {
-				throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
+				throw conflictCreator.create(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
 			}
 
 			const user = await userRepo.create({
@@ -76,13 +81,13 @@ export class AuthService {
 		const userRaw = await this.userService.getUserByEmailRaw(email);
 
 		const authRow = await this.authRepository.findByUserId(userRaw.userId);
-		if (!authRow) throw ErrorFactory.unauthorized(HTTP_MESSAGES.INVALID_CREDENTIALS);
+		if (!authRow) throw unauthorizedCreator.create(HTTP_MESSAGES.INVALID_CREDENTIALS);
 
 		const match = await bcrypt.compare(data.password, authRow.hashedPassword);
-		if (!match) throw ErrorFactory.unauthorized(HTTP_MESSAGES.INVALID_PASSWORD);
+		if (!match) throw unauthorizedCreator.create(HTTP_MESSAGES.INVALID_PASSWORD);
 
 		if (!userRaw.isEmailConfirmed) {
-			throw ErrorFactory.forbidden(HTTP_MESSAGES.EMAIL_NOT_CONFIRMED);
+			throw forbiddenCreator.create(HTTP_MESSAGES.EMAIL_NOT_CONFIRMED);
 		}
 
 		const token = jwt.sign(
@@ -106,7 +111,7 @@ export class AuthService {
 
 		const userRaw = await this.userService.getUserByIdRaw(decoded.userId);
 		if (!userRaw) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 
 		if (userRaw.isEmailConfirmed) {
@@ -161,17 +166,17 @@ export class AuthService {
 	): Promise<{ message: string }> => {
 		const userRaw = await this.userService.getUserByIdRaw(userId);
 		if (!userRaw) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 
 		const authRow = await this.authRepository.findByUserId(userId);
 		if (!authRow) {
-			throw ErrorFactory.unauthorized(HTTP_MESSAGES.INVALID_CREDENTIALS);
+			throw unauthorizedCreator.create(HTTP_MESSAGES.INVALID_CREDENTIALS);
 		}
 
 		const isPasswordValid = await bcrypt.compare(data.currentPassword, authRow.hashedPassword);
 		if (!isPasswordValid) {
-			throw ErrorFactory.unauthorized(HTTP_MESSAGES.CURRENT_PASSWORD_INCORRECT);
+			throw unauthorizedCreator.create(HTTP_MESSAGES.CURRENT_PASSWORD_INCORRECT);
 		}
 
 		const code = crypto.randomInt(100000, 999999).toString();
@@ -192,12 +197,12 @@ export class AuthService {
 	): Promise<{ message: string }> => {
 		const userRaw = await this.userService.getUserByIdRaw(userId);
 		if (!userRaw) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 
 		const authRow = await this.authRepository.findByUserId(userId);
 		if (!authRow) {
-			throw ErrorFactory.unauthorized(HTTP_MESSAGES.INVALID_CREDENTIALS);
+			throw unauthorizedCreator.create(HTTP_MESSAGES.INVALID_CREDENTIALS);
 		}
 
 		const hashedPassword = await bcrypt.hash(data.newPassword, BCRYPT_SALT_ROUNDS);
@@ -214,12 +219,12 @@ export class AuthService {
 	): Promise<{ message: string; token: string }> => {
 		const userRaw = await this.userService.getUserByIdRaw(userId);
 		if (!userRaw) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 
 		const authRow = await this.authRepository.findByUserId(userId);
 		if (!authRow) {
-			throw ErrorFactory.unauthorized(HTTP_MESSAGES.INVALID_CREDENTIALS);
+			throw unauthorizedCreator.create(HTTP_MESSAGES.INVALID_CREDENTIALS);
 		}
 
 		if (
@@ -227,7 +232,7 @@ export class AuthService {
 			!authRow.passwordChangeCodeExpiry ||
 			authRow.passwordChangeCodeExpiry < new Date()
 		) {
-			throw ErrorFactory.unauthorized(HTTP_MESSAGES.PASSWORD_CHANGE_CODE_INVALID);
+			throw unauthorizedCreator.create(HTTP_MESSAGES.PASSWORD_CHANGE_CODE_INVALID);
 		}
 
 		const passwordChangeToken = jwt.sign(
