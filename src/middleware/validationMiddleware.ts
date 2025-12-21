@@ -1,7 +1,7 @@
 import { Response, NextFunction, Request } from 'express';
 import { ZodType } from 'zod';
 import '../types/globals';
-import { ErrorFactory } from '../errors/errorFactory';
+import { validationCreator } from '../errors/errorFactory';
 import { formatZodError } from '../utils/errorUtils';
 
 export const validateRequest = (schemas: { body?: ZodType; params?: ZodType; query?: ZodType }) => {
@@ -11,7 +11,7 @@ export const validateRequest = (schemas: { body?: ZodType; params?: ZodType; que
 		if (schemas.body) {
 			const result = schemas.body.safeParse(req.body);
 			if (!result.success) {
-				throw ErrorFactory.validation(formatZodError(result.error));
+				throw validationCreator.create(undefined, formatZodError(result.error));
 			}
 			req.body = result.data;
 		}
@@ -19,7 +19,7 @@ export const validateRequest = (schemas: { body?: ZodType; params?: ZodType; que
 		if (schemas.params) {
 			const result = schemas.params.safeParse(req.params);
 			if (!result.success) {
-				throw ErrorFactory.validation(formatZodError(result.error));
+				throw validationCreator.create(undefined, formatZodError(result.error));
 			}
 			req.params = result.data as any;
 		}
@@ -27,7 +27,7 @@ export const validateRequest = (schemas: { body?: ZodType; params?: ZodType; que
 		if (schemas.query) {
 			const result = schemas.query.safeParse(req.query);
 			if (!result.success) {
-				throw ErrorFactory.validation(formatZodError(result.error));
+				throw validationCreator.create(undefined, formatZodError(result.error));
 			}
 			req.validatedReq.query = result.data;
 		}

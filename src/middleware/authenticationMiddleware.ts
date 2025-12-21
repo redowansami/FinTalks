@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { ErrorFactory } from '../errors/errorFactory';
+import { unauthorizedCreator } from '../errors/errorFactory';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { env } from '../utils/envParser';
 
@@ -22,7 +22,7 @@ export const requireAuth = async (
 	const authHeader = req.headers.authorization;
 
 	if (!authHeader || !authHeader.startsWith('Bearer ')) {
-		throw ErrorFactory.unauthorized(HTTP_MESSAGES.UNAUTHORIZED);
+		throw unauthorizedCreator.create(HTTP_MESSAGES.UNAUTHORIZED);
 	}
 
 	const token = authHeader.split(' ')[1];
@@ -31,7 +31,7 @@ export const requireAuth = async (
 	try {
 		payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
 	} catch {
-		throw ErrorFactory.unauthorized(HTTP_MESSAGES.INVALID_TOKEN);
+		throw unauthorizedCreator.create(HTTP_MESSAGES.INVALID_TOKEN);
 	}
 
 	req.user = {
