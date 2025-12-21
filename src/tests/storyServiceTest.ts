@@ -1,7 +1,7 @@
 import { StoryService } from '../services/storyService';
 import { StoryRepository } from '../repositories/storyRepository';
 import { CategoryService } from '../services/categoryService';
-import { ErrorFactory } from '../errors/errorFactory';
+import { notFoundCreator, conflictCreator } from '../errors/errorFactory';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { Story } from '../entities/storyEntity';
 import { Category } from '../entities/categoryEntity';
@@ -16,7 +16,10 @@ jest.mock('../services/categoryService');
 jest.mock('../utils/mapper');
 jest.mock('../utils/cursorPaginationHelper');
 jest.mock('../services/summarizerService');
-jest.mock('../errors/errorFactory');
+jest.mock('../errors/errorFactory', () => ({
+	notFoundCreator: { create: jest.fn() },
+	conflictCreator: { create: jest.fn() },
+}));
 
 describe('StoryService', () => {
 	let storyService: StoryService;
@@ -97,8 +100,8 @@ describe('StoryService', () => {
 
 		storyService = new StoryService(mockStoryRepository, mockCategoryService);
 
-		(ErrorFactory.conflict as jest.Mock).mockImplementation((msg: string) => new Error(msg));
-		(ErrorFactory.notFound as jest.Mock).mockImplementation((msg: string) => new Error(msg));
+		(conflictCreator.create as jest.Mock).mockImplementation((msg: string) => new Error(msg));
+		(notFoundCreator.create as jest.Mock).mockImplementation((msg: string) => new Error(msg));
 
 		(transformToDTO as jest.Mock).mockReturnValue(mockStoryResponseDTO);
 	});
@@ -201,13 +204,13 @@ describe('StoryService', () => {
 			]);
 
 			const mockError = new Error(HTTP_MESSAGES.INVALID_CATEGORIES);
-			(ErrorFactory.conflict as jest.Mock).mockReturnValueOnce(mockError);
+			(conflictCreator.create as jest.Mock).mockReturnValueOnce(mockError);
 
 			await expect(storyService.createStory(createStoryData)).rejects.toThrow(
 				HTTP_MESSAGES.INVALID_CATEGORIES,
 			);
 
-			expect(ErrorFactory.conflict).toHaveBeenCalledWith(HTTP_MESSAGES.INVALID_CATEGORIES);
+			expect(conflictCreator.create).toHaveBeenCalledWith(HTTP_MESSAGES.INVALID_CATEGORIES);
 		});
 
 		it('should attach summary data correctly to story', async () => {
@@ -396,13 +399,13 @@ describe('StoryService', () => {
 			(mockStoryRepository.findById as jest.Mock).mockResolvedValueOnce(null);
 
 			const mockError = new Error(HTTP_MESSAGES.STORY_NOT_FOUND);
-			(ErrorFactory.notFound as jest.Mock).mockReturnValueOnce(mockError);
+			(notFoundCreator.create as jest.Mock).mockReturnValueOnce(mockError);
 
 			await expect(storyService.getStoryById('non-existent-id')).rejects.toThrow(
 				HTTP_MESSAGES.STORY_NOT_FOUND,
 			);
 
-			expect(ErrorFactory.notFound).toHaveBeenCalledWith(HTTP_MESSAGES.STORY_NOT_FOUND);
+			expect(notFoundCreator.create).toHaveBeenCalledWith(HTTP_MESSAGES.STORY_NOT_FOUND);
 		});
 
 		it('should call repository with correct story id', async () => {
@@ -524,7 +527,7 @@ describe('StoryService', () => {
 			(mockStoryRepository.findById as jest.Mock).mockResolvedValueOnce(null);
 
 			const mockError = new Error(HTTP_MESSAGES.STORY_NOT_FOUND);
-			(ErrorFactory.notFound as jest.Mock).mockReturnValueOnce(mockError);
+			(notFoundCreator.create as jest.Mock).mockReturnValueOnce(mockError);
 
 			await expect(storyService.updateStory('non-existent-id', updateData)).rejects.toThrow(
 				HTTP_MESSAGES.STORY_NOT_FOUND,
@@ -546,7 +549,7 @@ describe('StoryService', () => {
 			]);
 
 			const mockError = new Error(HTTP_MESSAGES.INVALID_CATEGORIES);
-			(ErrorFactory.conflict as jest.Mock).mockReturnValueOnce(mockError);
+			(conflictCreator.create as jest.Mock).mockReturnValueOnce(mockError);
 
 			await expect(storyService.updateStory('story-123', updateData)).rejects.toThrow(
 				HTTP_MESSAGES.INVALID_CATEGORIES,
@@ -565,7 +568,7 @@ describe('StoryService', () => {
 			(mockStoryRepository.update as jest.Mock).mockResolvedValueOnce(mockStory);
 
 			const mockError = new Error(HTTP_MESSAGES.STORY_NOT_FOUND);
-			(ErrorFactory.notFound as jest.Mock).mockReturnValueOnce(mockError);
+			(notFoundCreator.create as jest.Mock).mockReturnValueOnce(mockError);
 
 			await expect(storyService.updateStory('story-123', updateData)).rejects.toThrow(
 				HTTP_MESSAGES.STORY_NOT_FOUND,
@@ -592,7 +595,7 @@ describe('StoryService', () => {
 			(mockStoryRepository.findById as jest.Mock).mockResolvedValueOnce(null);
 
 			const mockError = new Error(HTTP_MESSAGES.STORY_NOT_FOUND);
-			(ErrorFactory.notFound as jest.Mock).mockReturnValueOnce(mockError);
+			(notFoundCreator.create as jest.Mock).mockReturnValueOnce(mockError);
 
 			await expect(storyService.deleteStory('non-existent-id')).rejects.toThrow(
 				HTTP_MESSAGES.STORY_NOT_FOUND,
@@ -639,7 +642,7 @@ describe('StoryService', () => {
 			(mockStoryRepository.findById as jest.Mock).mockResolvedValueOnce(null);
 
 			const mockError = new Error(HTTP_MESSAGES.STORY_NOT_FOUND);
-			(ErrorFactory.notFound as jest.Mock).mockReturnValueOnce(mockError);
+			(notFoundCreator.create as jest.Mock).mockReturnValueOnce(mockError);
 
 			await expect(
 				storyService.addCategoriesToStory('non-existent-id', ['cat-123']),
@@ -653,7 +656,7 @@ describe('StoryService', () => {
 			(mockCategoryService.getCategoriesByIds as jest.Mock).mockResolvedValueOnce([]);
 
 			const mockError = new Error(HTTP_MESSAGES.INVALID_CATEGORIES);
-			(ErrorFactory.conflict as jest.Mock).mockReturnValueOnce(mockError);
+			(conflictCreator.create as jest.Mock).mockReturnValueOnce(mockError);
 
 			await expect(
 				storyService.addCategoriesToStory('story-123', ['cat-invalid']),
@@ -745,7 +748,7 @@ describe('StoryService', () => {
 			(mockStoryRepository.findById as jest.Mock).mockResolvedValueOnce(null);
 
 			const mockError = new Error(HTTP_MESSAGES.STORY_NOT_FOUND);
-			(ErrorFactory.notFound as jest.Mock).mockReturnValueOnce(mockError);
+			(notFoundCreator.create as jest.Mock).mockReturnValueOnce(mockError);
 
 			await expect(
 				storyService.removeCategoryFromStory('non-existent-id', 'cat-123'),

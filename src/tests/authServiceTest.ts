@@ -3,7 +3,12 @@ import { AuthRepository } from '../repositories/authRepository';
 import { UserRepository } from '../repositories/userRepository';
 import { UserService } from '../services/userService';
 import { TransactionService } from '../services/transactionService';
-import { ErrorFactory } from '../errors/errorFactory';
+import {
+	notFoundCreator,
+	unauthorizedCreator,
+	forbiddenCreator,
+	conflictCreator,
+} from '../errors/errorFactory';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -15,7 +20,12 @@ jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 jest.mock('crypto');
 jest.mock('../config/email');
-jest.mock('../errors/errorFactory');
+jest.mock('../errors/errorFactory', () => ({
+	notFoundCreator: { create: jest.fn() },
+	unauthorizedCreator: { create: jest.fn() },
+	forbiddenCreator: { create: jest.fn() },
+	conflictCreator: { create: jest.fn() },
+}));
 jest.mock('../utils/emailTemplates');
 
 const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
@@ -76,10 +86,10 @@ describe('AuthService', () => {
 		authService = new AuthService(mockAuthRepository, mockUserService, mockTransactionService);
 
 		jest.clearAllMocks();
-		(ErrorFactory.conflict as jest.Mock).mockImplementation((msg) => new Error(msg));
-		(ErrorFactory.unauthorized as jest.Mock).mockImplementation((msg) => new Error(msg));
-		(ErrorFactory.forbidden as jest.Mock).mockImplementation((msg) => new Error(msg));
-		(ErrorFactory.notFound as jest.Mock).mockImplementation((msg) => new Error(msg));
+		(notFoundCreator.create as jest.Mock).mockImplementation((msg) => new Error(msg));
+		(unauthorizedCreator.create as jest.Mock).mockImplementation((msg) => new Error(msg));
+		(forbiddenCreator.create as jest.Mock).mockImplementation((msg) => new Error(msg));
+		(conflictCreator.create as jest.Mock).mockImplementation((msg) => new Error(msg));
 	});
 
 	describe('signup', () => {
@@ -127,7 +137,7 @@ describe('AuthService', () => {
 				await callback(mockAuthRepo, mockUserRepo);
 			});
 
-			(ErrorFactory.conflict as jest.Mock).mockReturnValue(
+			(conflictCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS),
 			);
 
@@ -149,7 +159,7 @@ describe('AuthService', () => {
 				await callback(mockAuthRepo, mockUserRepo);
 			});
 
-			(ErrorFactory.conflict as jest.Mock).mockReturnValue(
+			(conflictCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS),
 			);
 
@@ -187,7 +197,7 @@ describe('AuthService', () => {
 		});
 
 		it('should throw error if user not found', async () => {
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.INVALID_CREDENTIALS),
 			);
 			mockUserService.getUserByEmailRaw.mockRejectedValue(new Error('User not found'));
@@ -200,7 +210,7 @@ describe('AuthService', () => {
 			mockAuthRepository.findByUserId.mockResolvedValue(mockAuth);
 			mockBcrypt.compare.mockResolvedValue(false as never);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.INVALID_PASSWORD),
 			);
 
@@ -214,7 +224,7 @@ describe('AuthService', () => {
 			mockAuthRepository.findByUserId.mockResolvedValue(mockAuth);
 			mockBcrypt.compare.mockResolvedValue(true as never);
 
-			(ErrorFactory.forbidden as jest.Mock).mockReturnValue(
+			(forbiddenCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.EMAIL_NOT_CONFIRMED),
 			);
 
@@ -227,7 +237,7 @@ describe('AuthService', () => {
 			mockUserService.getUserByEmailRaw.mockResolvedValue(mockUser);
 			mockAuthRepository.findByUserId.mockResolvedValue(null);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.INVALID_CREDENTIALS),
 			);
 
@@ -268,7 +278,7 @@ describe('AuthService', () => {
 			mockJwt.verify.mockReturnValue({ userId: 'invalid-id' } as never);
 			mockUserService.getUserByIdRaw.mockResolvedValue(null as any);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -326,7 +336,7 @@ describe('AuthService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(null as any);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -340,7 +350,7 @@ describe('AuthService', () => {
 			mockAuthRepository.findByUserId.mockResolvedValue(mockAuth);
 			mockBcrypt.compare.mockResolvedValue(false as never);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.CURRENT_PASSWORD_INCORRECT),
 			);
 
@@ -353,7 +363,7 @@ describe('AuthService', () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
 			mockAuthRepository.findByUserId.mockResolvedValue(null);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.INVALID_CREDENTIALS),
 			);
 
@@ -391,7 +401,7 @@ describe('AuthService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(null as any);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -404,7 +414,7 @@ describe('AuthService', () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
 			mockAuthRepository.findByUserId.mockResolvedValue(null);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.INVALID_CREDENTIALS),
 			);
 
@@ -444,7 +454,7 @@ describe('AuthService', () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
 			mockAuthRepository.findByUserId.mockResolvedValue(mockAuth);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.PASSWORD_CHANGE_CODE_INVALID),
 			);
 
@@ -463,7 +473,7 @@ describe('AuthService', () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
 			mockAuthRepository.findByUserId.mockResolvedValue(expiredAuth as Auth);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.PASSWORD_CHANGE_CODE_INVALID),
 			);
 
@@ -475,7 +485,7 @@ describe('AuthService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(null as any);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -487,7 +497,7 @@ describe('AuthService', () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
 			mockAuthRepository.findByUserId.mockResolvedValue(null);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.INVALID_CREDENTIALS),
 			);
 

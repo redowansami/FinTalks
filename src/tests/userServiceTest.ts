@@ -1,11 +1,14 @@
 import { UserService } from '../services/userService';
 import { UserRepository } from '../repositories/userRepository';
-import { ErrorFactory } from '../errors/errorFactory';
+import { notFoundCreator, conflictCreator } from '../errors/errorFactory';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { User, UserRole } from '../entities/userEntity';
 import { UpdateProfileDTO } from 'dtos/userDTO';
 
-jest.mock('../errors/errorFactory');
+jest.mock('../errors/errorFactory', () => ({
+	notFoundCreator: { create: jest.fn() },
+	conflictCreator: { create: jest.fn() },
+}));
 
 const mockUserRepository = {
 	findByUsername: jest.fn(),
@@ -36,8 +39,8 @@ describe('UserService', () => {
 	beforeEach(() => {
 		userService = new UserService(mockUserRepository);
 		jest.clearAllMocks();
-		(ErrorFactory.conflict as jest.Mock).mockImplementation((msg) => new Error(msg));
-		(ErrorFactory.notFound as jest.Mock).mockImplementation((msg) => new Error(msg));
+		(conflictCreator.create as jest.Mock).mockImplementation((msg) => new Error(msg));
+		(notFoundCreator.create as jest.Mock).mockImplementation((msg) => new Error(msg));
 	});
 
 	describe('createUser', () => {
@@ -69,7 +72,7 @@ describe('UserService', () => {
 		it('should throw error if username already exists', async () => {
 			mockUserRepository.findByUsername.mockResolvedValue(mockUser as User);
 
-			(ErrorFactory.conflict as jest.Mock).mockReturnValue(
+			(conflictCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS),
 			);
 
@@ -83,7 +86,7 @@ describe('UserService', () => {
 			mockUserRepository.findByUsername.mockResolvedValue(null);
 			mockUserRepository.findByEmail.mockResolvedValue(mockUser as User);
 
-			(ErrorFactory.conflict as jest.Mock).mockReturnValue(
+			(conflictCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS),
 			);
 
@@ -163,7 +166,7 @@ describe('UserService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserRepository.findById.mockResolvedValue(null);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -204,7 +207,7 @@ describe('UserService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserRepository.findByEmail.mockResolvedValue(null);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -257,7 +260,7 @@ describe('UserService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserRepository.findById.mockResolvedValue(null);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -285,7 +288,7 @@ describe('UserService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserRepository.findByEmail.mockResolvedValue(null);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -311,7 +314,7 @@ describe('UserService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserRepository.findById.mockResolvedValue(null);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -342,7 +345,7 @@ describe('UserService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserRepository.findById.mockResolvedValue(null);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -386,7 +389,7 @@ describe('UserService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserRepository.findById.mockResolvedValue(null);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -422,7 +425,7 @@ describe('UserService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserRepository.findById.mockResolvedValue(null);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
