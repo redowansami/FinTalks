@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import express from 'express';
+import cors from 'cors';
 import { registerDependencies } from './config/dependencyContainer';
 import { errorHandler, routeNotFoundHandler } from './middleware/errorMiddleware';
 import { env } from './utils/envParser';
@@ -9,6 +10,13 @@ import { swaggerSpec } from './api-docs/swagger';
 const PORT = env.PORT;
 const app = express();
 
+const corsOptions = {
+	origin: 'http://localhost:5173',
+	credentials: true,
+	optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(express.json());

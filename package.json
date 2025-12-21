@@ -33,10 +33,12 @@
   "homepage": "https://github.com/redowansami/FinTalks#readme",
   "dependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemailer": "^7.0.4",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",
