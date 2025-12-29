@@ -40,7 +40,9 @@ export class StoryService {
 		await this.storyRepository.save(story);
 	};
 
-	createStory = async (data: CreateStoryDTO): Promise<StoryResponseDTO> => {
+	createStory = async (
+		data: CreateStoryDTO & { userId: string; username?: string },
+	): Promise<StoryResponseDTO> => {
 		const summarizerResponse = await summarizerService.generateStorySummary(data.body);
 
 		const story = await this.storyRepository.create(data);

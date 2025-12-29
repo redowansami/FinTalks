@@ -11,7 +11,8 @@ export class StoryController {
 
 	create = async (req: Request & { user?: User }, res: Response): Promise<void> => {
 		const userId = req.user?.userId;
-		const result = await this.storyService.createStory({ ...req.body, userId });
+		const username = req.user?.username;
+		const result = await this.storyService.createStory({ ...req.body, userId, username });
 		res.status(HTTP_STATUS.CREATED).json({
 			success: true,
 			message: HTTP_MESSAGES.STORY_CREATED,
