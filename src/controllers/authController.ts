@@ -26,12 +26,8 @@ export class AuthController {
 
 	confirmEmail = async (req: Request, res: Response): Promise<void> => {
 		const { token } = req.params;
-		const result = await this.authService.confirmEmail(token);
-		res.status(HTTP_STATUS.OK).json({
-			success: true,
-			message: result.message,
-			isConfirmed: result.isConfirmed,
-		});
+		await this.authService.confirmEmail(token);
+		res.redirect('http://localhost:5173/');
 	};
 
 	resendConfirmationEmail = async (req: Request, res: Response): Promise<void> => {
