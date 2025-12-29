@@ -13,6 +13,7 @@ export const createStorySchema = z
 			.min(LENTGH_CONSTRAINTS.BODY_MIN, VALIDATION_MESSAGES.BODY_MIN)
 			.max(LENTGH_CONSTRAINTS.BODY_MAX, VALIDATION_MESSAGES.BODY_MAX),
 		categoryIds: z.array(z.uuid()).optional(),
+		imageUrl: z.url().optional(),
 	})
 	.strict();
 

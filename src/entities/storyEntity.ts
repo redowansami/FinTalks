@@ -48,6 +48,9 @@ export class Story {
 	@CreateDateColumn({ nullable: true })
 	summaryUpdatedAt: Date | null;
 
+	@Column({ type: 'varchar', nullable: true })
+	imageUrl: string | null;
+
 	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'userId' })
 	userByUserId: User;

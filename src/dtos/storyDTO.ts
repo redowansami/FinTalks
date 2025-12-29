@@ -24,5 +24,6 @@ export class StoryResponseDTO {
 	@Expose() reliabilityScore?: number | null;
 	@Expose() predictionComparison?: string | null;
 	@Expose() summaryUpdatedAt?: Date | null;
+	@Expose() imageUrl?: string | null;
 	@Expose() @Type(() => CategoryResponseDTO) categories?: CategoryResponseDTO[];
 }
