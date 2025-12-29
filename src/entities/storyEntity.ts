@@ -21,6 +21,9 @@ export class Story {
 	@Column({ type: 'uuid', nullable: false })
 	userId: string;
 
+	@Column({ type: 'varchar', length: LENTGH_CONSTRAINTS.USERNAME_MAX, nullable: true })
+	username: string | null;
+
 	@Column({ type: 'varchar', length: LENTGH_CONSTRAINTS.TITLE_MAX })
 	title: string;
 

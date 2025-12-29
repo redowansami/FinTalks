@@ -16,6 +16,7 @@ export type StoryQueryDTO = z.infer<typeof storyQuerySchema>;
 export class StoryResponseDTO {
 	@Expose() storyId: string;
 	@Expose() userId: string;
+	@Expose() username?: string | null;
 	@Expose() title: string;
 	@Expose() body: string;
 	@Expose() createdAt: Date;
