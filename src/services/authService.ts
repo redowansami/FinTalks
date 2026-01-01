@@ -1,10 +1,5 @@
 import { AuthRepository } from '../repositories/authRepository';
-import {
-	SignupDTO,
-	LoginDTO,
-	InitiatePasswordChangeDTO,
-	ConfirmPasswordChangeDTO,
-} from '../dtos/authDTO';
+import { SignupDTO, LoginDTO, ChangePasswordDTO } from '../dtos/authDTO';
 import {
 	notFoundCreator,
 	unauthorizedCreator,
@@ -22,7 +17,6 @@ import { TransactionService } from './transactionService';
 import { env } from '../utils/envParser';
 import transporter from '../config/email';
 import { emailTemplates } from '../utils/emailTemplates';
-import crypto from 'crypto';
 
 const JWT_SECRET = env.JWT_SECRET;
 const JWT_EXPIRES_IN = env.JWT_EXPIRES_IN;
@@ -31,7 +25,6 @@ const EMAIL_TOKEN_SECRET = env.EMAIL_TOKEN_SECRET;
 const EMAIL_TOKEN_EXPIRES_IN = env.EMAIL_TOKEN_EXPIRES_IN;
 const BACKEND_URL = env.BACKEND_URL;
 const EMAIL_FROM = env.EMAIL_FROM;
-const PASSWORD_CHANGE_CODE_EXPIRY = env.PASSWORD_CHANGE_CODE_EXPIRY;
 
 @injectable()
 export class AuthService {
@@ -160,9 +153,9 @@ export class AuthService {
 		});
 	};
 
-	initiatePasswordChange = async (
+	changePassword = async (
 		userId: string,
-		data: InitiatePasswordChangeDTO,
+		data: ChangePasswordDTO,
 	): Promise<{ message: string }> => {
 		const userRaw = await this.userService.getUserByIdRaw(userId);
 		if (!userRaw) {
@@ -179,85 +172,11 @@ export class AuthService {
 			throw unauthorizedCreator.create(HTTP_MESSAGES.CURRENT_PASSWORD_INCORRECT);
 		}
 
-		const code = crypto.randomInt(100000, 999999).toString();
-		const expiryTime = new Date(Date.now() + PASSWORD_CHANGE_CODE_EXPIRY * 1000);
-
-		await this.authRepository.updatePasswordChangeCode(authRow.authId, code, expiryTime);
-
-		await this.sendPasswordChangeEmail(userRaw.email, code);
-
-		return {
-			message: HTTP_MESSAGES.PASSWORD_CHANGE_EMAIL_SENT,
-		};
-	};
-
-	confirmPasswordChange = async (
-		userId: string,
-		data: ConfirmPasswordChangeDTO,
-	): Promise<{ message: string }> => {
-		const userRaw = await this.userService.getUserByIdRaw(userId);
-		if (!userRaw) {
-			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
-		}
-
-		const authRow = await this.authRepository.findByUserId(userId);
-		if (!authRow) {
-			throw unauthorizedCreator.create(HTTP_MESSAGES.INVALID_CREDENTIALS);
-		}
-
 		const hashedPassword = await bcrypt.hash(data.newPassword, BCRYPT_SALT_ROUNDS);
 		await this.authRepository.updatePassword(authRow.authId, hashedPassword);
 
 		return {
 			message: HTTP_MESSAGES.PASSWORD_CHANGED_SUCCESSFULLY,
 		};
-	};
-
-	confirmPasswordCode = async (
-		userId: string,
-		code: string,
-	): Promise<{ message: string; token: string }> => {
-		const userRaw = await this.userService.getUserByIdRaw(userId);
-		if (!userRaw) {
-			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
-		}
-
-		const authRow = await this.authRepository.findByUserId(userId);
-		if (!authRow) {
-			throw unauthorizedCreator.create(HTTP_MESSAGES.INVALID_CREDENTIALS);
-		}
-
-		if (
-			authRow.passwordChangeCode !== code ||
-			!authRow.passwordChangeCodeExpiry ||
-			authRow.passwordChangeCodeExpiry < new Date()
-		) {
-			throw unauthorizedCreator.create(HTTP_MESSAGES.PASSWORD_CHANGE_CODE_INVALID);
-		}
-
-		const passwordChangeToken = jwt.sign(
-			{
-				userId,
-			},
-			JWT_SECRET,
-			{ expiresIn: PASSWORD_CHANGE_CODE_EXPIRY },
-		);
-
-		return {
-			message: HTTP_MESSAGES.PASSWORD_CHANGE_CODE_VERIFIED,
-			token: passwordChangeToken,
-		};
-	};
-
-	private sendPasswordChangeEmail = async (userEmail: string, code: string): Promise<void> => {
-		await transporter.sendMail({
-			from: EMAIL_FROM,
-			to: userEmail,
-			subject: 'Confirm your password change request',
-			html: emailTemplates.passwordChangeEmail(
-				code,
-				`${PASSWORD_CHANGE_CODE_EXPIRY / 60} minutes`,
-			),
-		});
 	};
 }
