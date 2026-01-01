@@ -41,14 +41,7 @@ export const resendConfirmationEmailSchema = z.object({
 	email: z.email(VALIDATION_MESSAGES.INVALID_EMAIL).trim(),
 });
 
-export const initiatePasswordChangeSchema = z.object({
+export const changePasswordSchema = z.object({
 	currentPassword: passwordSchema,
-});
-
-export const confirmationCodeSchema = z.object({
-	code: z.string().min(LENTGH_CONSTRAINTS.CODE_LENGTH, VALIDATION_MESSAGES.CODE_LENGTH),
-});
-
-export const confirmPasswordChangeSchema = z.object({
 	newPassword: passwordSchema,
 });
