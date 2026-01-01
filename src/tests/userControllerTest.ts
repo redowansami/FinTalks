@@ -29,9 +29,7 @@ describe('UserController', () => {
 		} as unknown as jest.Mocked<UserService>;
 
 		mockAuthService = {
-			initiatePasswordChange: jest.fn(),
-			confirmPasswordChange: jest.fn(),
-			confirmPasswordCode: jest.fn(),
+			changePassword: jest.fn(),
 		} as unknown as jest.Mocked<AuthService>;
 
 		userController = new UserController(mockUserService, mockAuthService);
@@ -156,8 +154,8 @@ describe('UserController', () => {
 		});
 	});
 
-	describe('initiatePasswordChange', () => {
-		it('should initiate password change and return message', async () => {
+	describe('changePassword', () => {
+		it('should change password successfully', async () => {
 			const userId = 'user-123';
 			const passwordData = {
 				currentPassword: 'OldPassword123!',
@@ -165,84 +163,20 @@ describe('UserController', () => {
 			};
 
 			const mockResponse = {
-				message: 'Password change initiated',
-			};
-
-			mockReq.user = { userId };
-			mockReq.body = passwordData;
-			mockAuthService.initiatePasswordChange.mockResolvedValue(mockResponse as any);
-
-			await userController.initiatePasswordChange(mockReq as any, mockRes as Response);
-
-			expect(mockAuthService.initiatePasswordChange).toHaveBeenCalledWith(
-				userId,
-				passwordData,
-			);
-			expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
-			expect(mockRes.json).toHaveBeenCalledWith({
-				success: true,
-				message: mockResponse.message,
-			});
-		});
-	});
-
-	describe('confirmPasswordChange', () => {
-		it('should confirm password change with valid token', async () => {
-			const token = 'valid-jwt-token';
-			const userId = 'user-123';
-			const passwordData = {
-				code: '123456',
-				newPassword: 'NewPassword123!',
-			};
-
-			const mockResponse = {
 				message: 'Password changed successfully',
 			};
 
-			mockReq.params = { token };
-			mockReq.body = passwordData;
-
-			(jwt.verify as jest.Mock).mockReturnValue({ userId });
-			mockAuthService.confirmPasswordChange.mockResolvedValue(mockResponse as any);
-
-			await userController.confirmPasswordChange(mockReq as Request, mockRes as Response);
-
-			expect(jwt.verify).toHaveBeenCalledWith(token, expect.any(String));
-			expect(mockAuthService.confirmPasswordChange).toHaveBeenCalledWith(
-				userId,
-				passwordData,
-			);
-			expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
-			expect(mockRes.json).toHaveBeenCalledWith({
-				success: true,
-				message: mockResponse.message,
-			});
-		});
-	});
-
-	describe('confirmPasswordCode', () => {
-		it('should confirm password code and return token', async () => {
-			const userId = 'user-123';
-			const code = '123456';
-			const mockToken = 'new-jwt-token';
-
-			const mockResponse = {
-				message: 'Code verified',
-				token: mockToken,
-			};
-
 			mockReq.user = { userId };
-			mockReq.body = { code };
-			mockAuthService.confirmPasswordCode.mockResolvedValue(mockResponse as any);
+			mockReq.body = passwordData;
+			mockAuthService.changePassword.mockResolvedValue(mockResponse as any);
 
-			await userController.confirmPasswordCode(mockReq as any, mockRes as Response);
+			await userController.changePassword(mockReq as any, mockRes as Response);
 
-			expect(mockAuthService.confirmPasswordCode).toHaveBeenCalledWith(userId, code);
+			expect(mockAuthService.changePassword).toHaveBeenCalledWith(userId, passwordData);
 			expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
 			expect(mockRes.json).toHaveBeenCalledWith({
 				success: true,
 				message: mockResponse.message,
-				token: mockToken,
 			});
 		});
 	});
