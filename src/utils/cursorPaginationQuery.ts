@@ -19,5 +19,5 @@ export function buildCursorPaginationQuery<T extends ObjectLiteral>(
 		queryBuilder.addOrderBy(cursorField, 'ASC');
 	}
 
-	return queryBuilder.limit(limit);
+	return queryBuilder.take(limit);
 }

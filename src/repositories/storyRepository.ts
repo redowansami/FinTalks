@@ -45,7 +45,7 @@ export class StoryRepository {
 		const orderByField = orderBy ? `story.${orderBy}` : 'story.storyId';
 		buildCursorPaginationQuery(queryBuilder, 'story.storyId', startAfter, limit, orderByField);
 
-		return queryBuilder.distinct(true).getMany();
+		return queryBuilder.getMany();
 	};
 
 	findById = async (id: string): Promise<Story | null> => {
