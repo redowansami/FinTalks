@@ -8,12 +8,14 @@ import {
 	ManyToMany,
 	JoinColumn,
 	DeleteDateColumn,
+	Index,
 } from 'typeorm';
 import { User } from './userEntity';
 import { Category } from './categoryEntity';
 import { LENTGH_CONSTRAINTS } from '../constants/validationConstants';
 
 @Entity('stories')
+@Index('idx_stories_pagination', (entity: Story) => [entity.createdAt, entity.storyId])
 export class Story {
 	@PrimaryGeneratedColumn('uuid')
 	storyId: string;

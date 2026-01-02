@@ -20,7 +20,5 @@ export enum UserOrderByFields {
 
 export enum StoryOrderByFields {
 	STORY_ID = 'storyId',
-	TITLE = 'title',
 	CREATED_AT = 'createdAt',
-	UPDATED_AT = 'updatedAt',
 }

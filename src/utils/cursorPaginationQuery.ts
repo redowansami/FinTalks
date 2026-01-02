@@ -1,22 +1,31 @@
 import { ObjectLiteral, SelectQueryBuilder } from 'typeorm';
+import { decodeCursor } from './cursorPaginationHelper';
 
 export function buildCursorPaginationQuery<T extends ObjectLiteral>(
 	queryBuilder: SelectQueryBuilder<T>,
-	cursorField: string,
+	idField: string,
 	cursorValue: string | undefined,
 	limit: number,
 	orderBy?: string,
 ): SelectQueryBuilder<T> {
-	const primaryOrderField = orderBy || cursorField;
+	const primaryOrderField = orderBy || 'createdAt';
+	const secondaryOrderField = idField;
 
-	queryBuilder.orderBy(primaryOrderField, 'ASC');
+	queryBuilder.orderBy(primaryOrderField, 'DESC');
+	queryBuilder.addOrderBy(secondaryOrderField, 'DESC');
 
 	if (cursorValue) {
-		queryBuilder.andWhere(`${primaryOrderField} > :cursorValue`, { cursorValue });
-	}
-
-	if (orderBy && orderBy !== cursorField) {
-		queryBuilder.addOrderBy(cursorField, 'ASC');
+		const decodedCursor = decodeCursor(cursorValue);
+		if (decodedCursor) {
+			const { timestamp, id } = decodedCursor;
+			queryBuilder.andWhere(
+				`(${primaryOrderField} < :timestamp OR (${primaryOrderField} = :timestamp AND ${secondaryOrderField} < :id))`,
+				{
+					timestamp: new Date(timestamp),
+					id,
+				},
+			);
+		}
 	}
 
 	return queryBuilder.take(limit);

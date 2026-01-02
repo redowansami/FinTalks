@@ -18,6 +18,8 @@ export class StoryRepository {
 	};
 
 	findAll = async (queryParams: StoryQueryDTO): Promise<Story[]> => {
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+
 		const { search, orderBy, category, startAfter, limit } = queryParams;
 		const queryBuilder = this.repository
 			.createQueryBuilder('story')
@@ -42,7 +44,7 @@ export class StoryRepository {
 			);
 		}
 
-		const orderByField = orderBy ? `story.${orderBy}` : 'story.storyId';
+		const orderByField = orderBy ? `story.${orderBy}` : 'story.createdAt';
 		buildCursorPaginationQuery(queryBuilder, 'story.storyId', startAfter, limit, orderByField);
 
 		return queryBuilder.getMany();

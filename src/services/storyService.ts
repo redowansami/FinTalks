@@ -63,7 +63,6 @@ export class StoryService {
 			queryParams,
 			(params) => this.storyRepository.findAll(params),
 			StoryResponseDTO,
-			'storyId',
 		);
 	};
 
