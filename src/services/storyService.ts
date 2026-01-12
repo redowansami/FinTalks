@@ -88,13 +88,13 @@ export class StoryService {
 
 		await this.storyRepository.update(id, storyData);
 
-		if (categoryIds) {
-			await this.addCategoriesToStory(id, categoryIds);
-		}
-
 		const updatedStory = await this.storyRepository.findById(id);
 		if (!updatedStory) {
 			throw notFoundCreator.create(HTTP_MESSAGES.STORY_NOT_FOUND);
+		}
+
+		if (categoryIds) {
+			await this.attachCategories(updatedStory, categoryIds);
 		}
 
 		if (summarizerResponse && bodyChanged) {
@@ -123,7 +123,7 @@ export class StoryService {
 			throw conflictCreator.create(HTTP_MESSAGES.INVALID_CATEGORIES);
 		}
 
-		story.categories = [...(story.categories || []), ...(newCategories as Category[])];
+		story.categories = newCategories as Category[];
 		await this.storyRepository.save(story);
 
 		return transformToDTO(StoryResponseDTO, story);
