@@ -143,4 +143,15 @@ export class StoryService {
 
 		return transformToDTO(StoryResponseDTO, story);
 	};
+
+	getStoriesByUserId = async (
+		userId: string,
+		queryParams: StoryQueryDTO,
+	): Promise<{ list: StoryResponseDTO[]; nextCursor: string | null }> => {
+		return getPaginatedResults(
+			queryParams,
+			(params) => this.storyRepository.findByUserId(userId, params),
+			StoryResponseDTO,
+		);
+	};
 }

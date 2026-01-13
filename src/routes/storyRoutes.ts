@@ -20,6 +20,11 @@ const storyController = container.resolve(StoryController);
 router
 	.post('/', requireAuth, validateRequest({ body: createStorySchema }), storyController.create)
 	.get('/', validateRequest({ query: storyQuerySchema }), storyController.findAll)
+	.get(
+		'/users/:userId',
+		validateRequest({ query: storyQuerySchema }),
+		storyController.getStoriesByUserId,
+	)
 	.delete(
 		'/:storyId/categories/:categoryId',
 		requireAuth,

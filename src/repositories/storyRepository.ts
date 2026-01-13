@@ -71,4 +71,36 @@ export class StoryRepository {
 	save = async (story: Story): Promise<Story> => {
 		return this.repository.save(story);
 	};
+
+	findByUserId = async (userId: string, queryParams: StoryQueryDTO): Promise<Story[]> => {
+		const { search, orderBy, category, startAfter, limit } = queryParams;
+		const queryBuilder = this.repository
+			.createQueryBuilder('story')
+			.where('story.userId = :userId', { userId })
+			.leftJoinAndSelect('story.userByUserId', 'user')
+			.leftJoinAndSelect('story.categories', 'categories');
+
+		if (search && search.trim()) {
+			applyFuzzySearch(queryBuilder, {
+				'story.title': search,
+				'user.name': search,
+			});
+		}
+
+		if (category && category.trim()) {
+			queryBuilder.innerJoin(
+				'story.categories',
+				'filterCategories',
+				'LOWER(filterCategories.name) LIKE LOWER(:category)',
+				{
+					category: `%${category}%`,
+				},
+			);
+		}
+
+		const orderByField = orderBy ? `story.${orderBy}` : 'story.createdAt';
+		buildCursorPaginationQuery(queryBuilder, 'story.storyId', startAfter, limit, orderByField);
+
+		return queryBuilder.getMany();
+	};
 }

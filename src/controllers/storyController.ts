@@ -58,4 +58,13 @@ export class StoryController {
 
 		res.sendStatus(HTTP_STATUS.NO_CONTENT);
 	};
+
+	getStoriesByUserId = async (req: Request, res: Response): Promise<void> => {
+		const userId = req.params.userId;
+		const result = await this.storyService.getStoriesByUserId(
+			userId,
+			req.validatedReq.query as StoryQueryDTO,
+		);
+		res.status(HTTP_STATUS.OK).json({ success: true, ...result });
+	};
 }
