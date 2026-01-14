@@ -29,4 +29,5 @@ export const env = {
 	AI_SUMMARIZATION_TIMEOUT_MS: parseInt(process.env.AI_SUMMARIZATION_TIMEOUT_MS || '30000'),
 	AI_SUMMARIZATION_MAX_RETRIES: parseInt(process.env.AI_SUMMARIZATION_MAX_RETRIES || '3'),
 	PASSWORD_CHANGE_CODE_EXPIRY: Number(process.env.PASSWORD_CHANGE_CODE_EXPIRY || '900'),
+	CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:5173',
 };
