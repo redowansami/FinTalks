@@ -6,6 +6,7 @@ import {
 	DatabaseError,
 	ConflictError,
 	ValidationErrorDetail,
+	RateLimitError,
 } from './customErrors';
 import { ErrorCreator } from './baseErrorCreator';
 
@@ -42,5 +43,11 @@ export class DatabaseErrorCreator extends ErrorCreator {
 export class ConflictErrorCreator extends ErrorCreator {
 	create(message?: string): ConflictError {
 		return new ConflictError(message);
+	}
+}
+
+export class RateLimitErrorCreator extends ErrorCreator {
+	create(message?: string): RateLimitError {
+		return new RateLimitError(message);
 	}
 }

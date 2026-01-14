@@ -54,3 +54,11 @@ export class ConflictError extends AppError {
 		super(message);
 	}
 }
+
+export class RateLimitError extends AppError {
+	public readonly statusCode = HTTP_STATUS.TOO_MANY_REQUESTS;
+
+	constructor(message: string = 'Too many requests. Please try again later.') {
+		super(message);
+	}
+}
