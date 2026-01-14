@@ -31,10 +31,16 @@ export const signupSchema = z
 	})
 	.strict();
 
-export const loginSchema = signupSchema
-	.partial()
-	.omit({ username: true, name: true })
-	.required()
+export const loginSchema = z
+	.object({
+		email: z
+			.email(VALIDATION_MESSAGES.INVALID_EMAIL)
+			.max(LENTGH_CONSTRAINTS.EMAIL_MAX, VALIDATION_MESSAGES.EMAIL_MAX)
+			.trim(),
+		password: z
+			.string()
+			.min(LENTGH_CONSTRAINTS.REQ_PASSWORD_MIN, VALIDATION_MESSAGES.REQ_PASSWORD),
+	})
 	.strict();
 
 export const resendConfirmationEmailSchema = z.object({
