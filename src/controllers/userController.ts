@@ -2,13 +2,11 @@ import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { AuthService } from '../services/authService';
 import { UserQueryDTO } from '../dtos/userDTO';
-import { InitiatePasswordChangeDTO, ConfirmPasswordChangeDTO } from '../dtos/authDTO';
+import { ChangePasswordDTO } from '../dtos/authDTO';
 import { HTTP_STATUS, HTTP_MESSAGES } from '../constants/httpConstants';
 import '../types/globals';
 import { injectable } from 'tsyringe';
 import { User } from 'entities/userEntity';
-import jwt from 'jsonwebtoken';
-import { env } from '../utils/envParser';
 
 @injectable()
 export class UserController {
@@ -46,47 +44,15 @@ export class UserController {
 		});
 	};
 
-	initiatePasswordChange = async (
-		req: Request & { user?: User },
-		res: Response,
-	): Promise<void> => {
+	changePassword = async (req: Request & { user?: User }, res: Response): Promise<void> => {
 		const userId = req.user!.userId;
-		const data = req.body as InitiatePasswordChangeDTO;
+		const data = req.body as ChangePasswordDTO;
 
-		const result = await this.authService.initiatePasswordChange(userId, data);
-
-		res.status(HTTP_STATUS.OK).json({
-			success: true,
-			message: result.message,
-		});
-	};
-
-	confirmPasswordChange = async (req: Request, res: Response): Promise<void> => {
-		const { token } = req.params;
-		const data = req.body as ConfirmPasswordChangeDTO;
-
-		const decoded = jwt.verify(token, env.JWT_SECRET) as {
-			userId: string;
-		};
-
-		const result = await this.authService.confirmPasswordChange(decoded.userId, data);
+		const result = await this.authService.changePassword(userId, data);
 
 		res.status(HTTP_STATUS.OK).json({
 			success: true,
 			message: result.message,
-		});
-	};
-
-	confirmPasswordCode = async (req: Request & { user?: User }, res: Response): Promise<void> => {
-		const userId = req.user!.userId;
-		const { code } = req.body;
-
-		const result = await this.authService.confirmPasswordCode(userId, code);
-
-		res.status(HTTP_STATUS.OK).json({
-			success: true,
-			message: result.message,
-			token: result.token,
 		});
 	};
 

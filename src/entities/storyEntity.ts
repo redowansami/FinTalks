@@ -8,18 +8,23 @@ import {
 	ManyToMany,
 	JoinColumn,
 	DeleteDateColumn,
+	Index,
 } from 'typeorm';
 import { User } from './userEntity';
 import { Category } from './categoryEntity';
 import { LENTGH_CONSTRAINTS } from '../constants/validationConstants';
 
 @Entity('stories')
+@Index('idx_stories_pagination', (entity: Story) => [entity.createdAt, entity.storyId])
 export class Story {
 	@PrimaryGeneratedColumn('uuid')
 	storyId: string;
 
 	@Column({ type: 'uuid', nullable: false })
 	userId: string;
+
+	@Column({ type: 'varchar', length: LENTGH_CONSTRAINTS.USERNAME_MAX, nullable: true })
+	username: string | null;
 
 	@Column({ type: 'varchar', length: LENTGH_CONSTRAINTS.TITLE_MAX })
 	title: string;
@@ -47,6 +52,9 @@ export class Story {
 
 	@CreateDateColumn({ nullable: true })
 	summaryUpdatedAt: Date | null;
+
+	@Column({ type: 'varchar', nullable: true })
+	imageUrl: string | null;
 
 	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'userId' })

@@ -1,35 +1,16 @@
 import {
-	NotFoundError,
-	ValidationError,
-	UnauthorizedError,
-	ForbiddenError,
-	DatabaseError,
-	ConflictError,
-	ValidationErrorDetail,
-} from './customErrors';
+	NotFoundErrorCreator,
+	ValidationErrorCreator,
+	UnauthorizedErrorCreator,
+	ForbiddenErrorCreator,
+	DatabaseErrorCreator,
+	ConflictErrorCreator,
+} from './concreteErrorCreator';
+import { ErrorCreator } from './baseErrorCreator';
 
-export class ErrorFactory {
-	static notFound(message?: string): NotFoundError {
-		return new NotFoundError(message);
-	}
-
-	static validation(details?: ValidationErrorDetail, message?: string): ValidationError {
-		return new ValidationError(details, message);
-	}
-
-	static unauthorized(message?: string): UnauthorizedError {
-		return new UnauthorizedError(message);
-	}
-
-	static forbidden(message?: string): ForbiddenError {
-		return new ForbiddenError(message);
-	}
-
-	static database(message?: string): DatabaseError {
-		return new DatabaseError(message);
-	}
-
-	static conflict(message?: string): ConflictError {
-		return new ConflictError(message);
-	}
-}
+export const notFoundCreator: ErrorCreator = new NotFoundErrorCreator();
+export const validationCreator: ErrorCreator = new ValidationErrorCreator();
+export const unauthorizedCreator: ErrorCreator = new UnauthorizedErrorCreator();
+export const forbiddenCreator: ErrorCreator = new ForbiddenErrorCreator();
+export const databaseCreator: ErrorCreator = new DatabaseErrorCreator();
+export const conflictCreator: ErrorCreator = new ConflictErrorCreator();

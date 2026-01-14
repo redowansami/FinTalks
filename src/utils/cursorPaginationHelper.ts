@@ -1,8 +1,32 @@
+import { StoryResponseDTO } from 'dtos/storyDTO';
 import { transformToDTO } from './mapper';
 
 interface PaginationResult<T> {
 	list: T[];
 	nextCursor: string | null;
+}
+
+export interface CursorData {
+	timestamp: string;
+	id: string;
+}
+
+export function encodeCursor(timestamp: Date, id: string): string {
+	const cursorData: CursorData = {
+		timestamp: timestamp.toISOString(),
+		id,
+	};
+	const jsonString = JSON.stringify(cursorData);
+	return Buffer.from(jsonString).toString('base64');
+}
+
+export function decodeCursor(cursor: string): CursorData | null {
+	try {
+		const jsonString = Buffer.from(cursor, 'base64').toString('utf-8');
+		return JSON.parse(jsonString) as CursorData;
+	} catch {
+		return null;
+	}
 }
 
 export async function getPaginatedResults<
@@ -13,7 +37,6 @@ export async function getPaginatedResults<
 	queryParams: TQueryParams,
 	findPaginated: (params: TQueryParams & { limit: number }) => Promise<TEntity[]>,
 	ResponseDTO: new () => TResponse,
-	defaultOrderBy: string,
 ): Promise<PaginationResult<TResponse>> {
 	const cursor = queryParams.startAfter;
 
@@ -31,8 +54,12 @@ export async function getPaginatedResults<
 	let nextCursor: string | null = null;
 	if (hasMore) {
 		const lastItem = list[list.length - 1];
-		const orderByField = queryParams.orderBy || defaultOrderBy;
-		nextCursor = String(lastItem[orderByField as keyof TResponse]);
+		const createdAt = (lastItem as StoryResponseDTO).createdAt;
+		const id = (lastItem as StoryResponseDTO).storyId || (lastItem as any).id;
+
+		if (createdAt && id) {
+			nextCursor = encodeCursor(new Date(createdAt), String(id));
+		}
 	}
 
 	return { list, nextCursor };

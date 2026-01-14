@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { container } from 'tsyringe';
-import { ErrorFactory } from '../errors/errorFactory';
+import { unauthorizedCreator, forbiddenCreator } from '../errors/errorFactory';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { User, UserRole } from '../entities/userEntity';
 import { StoryService } from '../services/storyService';
@@ -11,7 +11,7 @@ const checkOwnershipOrRole = (
 	allowedRoles: UserRole[] = [],
 ): void => {
 	if (!user) {
-		throw ErrorFactory.unauthorized(HTTP_MESSAGES.UNAUTHORIZED);
+		throw unauthorizedCreator.create(HTTP_MESSAGES.UNAUTHORIZED);
 	}
 
 	if (user.userId === ownershipId) {
@@ -22,7 +22,7 @@ const checkOwnershipOrRole = (
 		return;
 	}
 
-	throw ErrorFactory.forbidden(HTTP_MESSAGES.FORBIDDEN);
+	throw forbiddenCreator.create(HTTP_MESSAGES.FORBIDDEN);
 };
 
 export const requireAdmin = (
@@ -32,11 +32,11 @@ export const requireAdmin = (
 ): void => {
 	const user = req.user;
 	if (!user) {
-		throw ErrorFactory.unauthorized(HTTP_MESSAGES.UNAUTHORIZED);
+		throw unauthorizedCreator.create(HTTP_MESSAGES.UNAUTHORIZED);
 	}
 
 	if (user.role !== UserRole.ADMIN) {
-		throw ErrorFactory.forbidden(HTTP_MESSAGES.FORBIDDEN);
+		throw forbiddenCreator.create(HTTP_MESSAGES.FORBIDDEN);
 	}
 
 	next();

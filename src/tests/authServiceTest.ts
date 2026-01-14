@@ -3,11 +3,15 @@ import { AuthRepository } from '../repositories/authRepository';
 import { UserRepository } from '../repositories/userRepository';
 import { UserService } from '../services/userService';
 import { TransactionService } from '../services/transactionService';
-import { ErrorFactory } from '../errors/errorFactory';
+import {
+	notFoundCreator,
+	unauthorizedCreator,
+	forbiddenCreator,
+	conflictCreator,
+} from '../errors/errorFactory';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
 import { User, UserRole } from '../entities/userEntity';
 import { Auth } from '../entities/authEntity';
 
@@ -15,12 +19,16 @@ jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 jest.mock('crypto');
 jest.mock('../config/email');
-jest.mock('../errors/errorFactory');
+jest.mock('../errors/errorFactory', () => ({
+	notFoundCreator: { create: jest.fn() },
+	unauthorizedCreator: { create: jest.fn() },
+	forbiddenCreator: { create: jest.fn() },
+	conflictCreator: { create: jest.fn() },
+}));
 jest.mock('../utils/emailTemplates');
 
 const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 const mockJwt = jwt as jest.Mocked<typeof jwt>;
-const mockCrypto = crypto as jest.Mocked<typeof crypto>;
 
 describe('AuthService', () => {
 	let authService: AuthService;
@@ -76,10 +84,10 @@ describe('AuthService', () => {
 		authService = new AuthService(mockAuthRepository, mockUserService, mockTransactionService);
 
 		jest.clearAllMocks();
-		(ErrorFactory.conflict as jest.Mock).mockImplementation((msg) => new Error(msg));
-		(ErrorFactory.unauthorized as jest.Mock).mockImplementation((msg) => new Error(msg));
-		(ErrorFactory.forbidden as jest.Mock).mockImplementation((msg) => new Error(msg));
-		(ErrorFactory.notFound as jest.Mock).mockImplementation((msg) => new Error(msg));
+		(notFoundCreator.create as jest.Mock).mockImplementation((msg) => new Error(msg));
+		(unauthorizedCreator.create as jest.Mock).mockImplementation((msg) => new Error(msg));
+		(forbiddenCreator.create as jest.Mock).mockImplementation((msg) => new Error(msg));
+		(conflictCreator.create as jest.Mock).mockImplementation((msg) => new Error(msg));
 	});
 
 	describe('signup', () => {
@@ -127,7 +135,7 @@ describe('AuthService', () => {
 				await callback(mockAuthRepo, mockUserRepo);
 			});
 
-			(ErrorFactory.conflict as jest.Mock).mockReturnValue(
+			(conflictCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS),
 			);
 
@@ -149,7 +157,7 @@ describe('AuthService', () => {
 				await callback(mockAuthRepo, mockUserRepo);
 			});
 
-			(ErrorFactory.conflict as jest.Mock).mockReturnValue(
+			(conflictCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS),
 			);
 
@@ -187,7 +195,7 @@ describe('AuthService', () => {
 		});
 
 		it('should throw error if user not found', async () => {
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.INVALID_CREDENTIALS),
 			);
 			mockUserService.getUserByEmailRaw.mockRejectedValue(new Error('User not found'));
@@ -200,7 +208,7 @@ describe('AuthService', () => {
 			mockAuthRepository.findByUserId.mockResolvedValue(mockAuth);
 			mockBcrypt.compare.mockResolvedValue(false as never);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.INVALID_PASSWORD),
 			);
 
@@ -214,7 +222,7 @@ describe('AuthService', () => {
 			mockAuthRepository.findByUserId.mockResolvedValue(mockAuth);
 			mockBcrypt.compare.mockResolvedValue(true as never);
 
-			(ErrorFactory.forbidden as jest.Mock).mockReturnValue(
+			(forbiddenCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.EMAIL_NOT_CONFIRMED),
 			);
 
@@ -227,7 +235,7 @@ describe('AuthService', () => {
 			mockUserService.getUserByEmailRaw.mockResolvedValue(mockUser);
 			mockAuthRepository.findByUserId.mockResolvedValue(null);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.INVALID_CREDENTIALS),
 			);
 
@@ -268,7 +276,7 @@ describe('AuthService', () => {
 			mockJwt.verify.mockReturnValue({ userId: 'invalid-id' } as never);
 			mockUserService.getUserByIdRaw.mockResolvedValue(null as any);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
@@ -300,86 +308,29 @@ describe('AuthService', () => {
 		});
 	});
 
-	describe('initiatePasswordChange', () => {
+	describe('changePassword', () => {
 		const userId = mockUser.userId;
-		const initiateData = {
+		const changeData = {
 			currentPassword: 'password123',
-		};
-
-		it('should initiate password change successfully', async () => {
-			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
-			mockAuthRepository.findByUserId.mockResolvedValue(mockAuth);
-			mockBcrypt.compare.mockResolvedValue(true as never);
-			mockCrypto.randomInt.mockReturnValue(123456 as never);
-			mockAuthRepository.updatePasswordChangeCode.mockResolvedValue(mockAuth as never);
-
-			const result = await authService.initiatePasswordChange(userId, initiateData);
-
-			expect(result.message).toBe(HTTP_MESSAGES.PASSWORD_CHANGE_EMAIL_SENT);
-			expect(mockBcrypt.compare).toHaveBeenCalledWith(
-				initiateData.currentPassword,
-				mockAuth.hashedPassword,
-			);
-			expect(mockAuthRepository.updatePasswordChangeCode).toHaveBeenCalled();
-		});
-
-		it('should throw error if user not found', async () => {
-			mockUserService.getUserByIdRaw.mockResolvedValue(null as any);
-
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
-				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
-			);
-
-			await expect(authService.initiatePasswordChange(userId, initiateData)).rejects.toThrow(
-				HTTP_MESSAGES.USER_NOT_FOUND,
-			);
-		});
-
-		it('should throw error if current password is incorrect', async () => {
-			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
-			mockAuthRepository.findByUserId.mockResolvedValue(mockAuth);
-			mockBcrypt.compare.mockResolvedValue(false as never);
-
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
-				new Error(HTTP_MESSAGES.CURRENT_PASSWORD_INCORRECT),
-			);
-
-			await expect(authService.initiatePasswordChange(userId, initiateData)).rejects.toThrow(
-				HTTP_MESSAGES.CURRENT_PASSWORD_INCORRECT,
-			);
-		});
-
-		it('should throw error if authRow is not found', async () => {
-			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
-			mockAuthRepository.findByUserId.mockResolvedValue(null);
-
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
-				new Error(HTTP_MESSAGES.INVALID_CREDENTIALS),
-			);
-
-			await expect(authService.initiatePasswordChange(userId, initiateData)).rejects.toThrow(
-				HTTP_MESSAGES.INVALID_CREDENTIALS,
-			);
-		});
-	});
-
-	describe('confirmPasswordChange', () => {
-		const userId = mockUser.userId;
-		const confirmData = {
 			newPassword: 'newpassword123',
 		};
 
-		it('should confirm password change successfully', async () => {
+		it('should change password successfully', async () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
 			mockAuthRepository.findByUserId.mockResolvedValue(mockAuth);
+			mockBcrypt.compare.mockResolvedValue(true as never);
 			mockBcrypt.hash.mockResolvedValue('new-hashed-password' as never);
 			mockAuthRepository.updatePassword.mockResolvedValue(mockAuth as never);
 
-			const result = await authService.confirmPasswordChange(userId, confirmData);
+			const result = await authService.changePassword(userId, changeData);
 
 			expect(result.message).toBe(HTTP_MESSAGES.PASSWORD_CHANGED_SUCCESSFULLY);
+			expect(mockBcrypt.compare).toHaveBeenCalledWith(
+				changeData.currentPassword,
+				mockAuth.hashedPassword,
+			);
 			expect(mockBcrypt.hash).toHaveBeenCalledWith(
-				confirmData.newPassword,
+				changeData.newPassword,
 				expect.any(Number),
 			);
 			expect(mockAuthRepository.updatePassword).toHaveBeenCalledWith(
@@ -391,107 +342,38 @@ describe('AuthService', () => {
 		it('should throw error if user not found', async () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(null as any);
 
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
+			(notFoundCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
 			);
 
-			await expect(authService.confirmPasswordChange(userId, confirmData)).rejects.toThrow(
+			await expect(authService.changePassword(userId, changeData)).rejects.toThrow(
 				HTTP_MESSAGES.USER_NOT_FOUND,
 			);
 		});
 
-		it('should throw error if authRow is not found', async () => {
-			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
-			mockAuthRepository.findByUserId.mockResolvedValue(null);
-
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
-				new Error(HTTP_MESSAGES.INVALID_CREDENTIALS),
-			);
-
-			await expect(authService.confirmPasswordChange(userId, confirmData)).rejects.toThrow(
-				HTTP_MESSAGES.INVALID_CREDENTIALS,
-			);
-		});
-	});
-
-	describe('confirmPasswordCode', () => {
-		const userId = mockUser.userId;
-		const code = '123456';
-
-		it('should confirm password code and return token', async () => {
-			const authWithCode: Auth = {
-				...mockAuth,
-				passwordChangeCode: code,
-				passwordChangeCodeExpiry: new Date(Date.now() + 10 * 60 * 1000),
-			};
-
-			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
-			mockAuthRepository.findByUserId.mockResolvedValue(authWithCode);
-			mockJwt.sign.mockReturnValue('password-change-token' as never);
-
-			const result = await authService.confirmPasswordCode(userId, code);
-
-			expect(result.message).toBe(HTTP_MESSAGES.PASSWORD_CHANGE_CODE_VERIFIED);
-			expect(result.token).toBe('password-change-token');
-			expect(mockJwt.sign).toHaveBeenCalledWith(
-				{ userId },
-				expect.any(String),
-				expect.any(Object),
-			);
-		});
-
-		it('should throw error if code is invalid', async () => {
+		it('should throw error if current password is incorrect', async () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
 			mockAuthRepository.findByUserId.mockResolvedValue(mockAuth);
+			mockBcrypt.compare.mockResolvedValue(false as never);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
-				new Error(HTTP_MESSAGES.PASSWORD_CHANGE_CODE_INVALID),
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
+				new Error(HTTP_MESSAGES.CURRENT_PASSWORD_INCORRECT),
 			);
 
-			await expect(authService.confirmPasswordCode(userId, 'wrong-code')).rejects.toThrow(
-				HTTP_MESSAGES.PASSWORD_CHANGE_CODE_INVALID,
-			);
-		});
-
-		it('should throw error if code is expired', async () => {
-			const expiredAuth = {
-				...mockAuth,
-				passwordChangeCode: code,
-				passwordChangeCodeExpiry: new Date(Date.now() - 10 * 60 * 1000),
-			};
-
-			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
-			mockAuthRepository.findByUserId.mockResolvedValue(expiredAuth as Auth);
-
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
-				new Error(HTTP_MESSAGES.PASSWORD_CHANGE_CODE_INVALID),
-			);
-
-			await expect(authService.confirmPasswordCode(userId, code)).rejects.toThrow(
-				HTTP_MESSAGES.PASSWORD_CHANGE_CODE_INVALID,
+			await expect(authService.changePassword(userId, changeData)).rejects.toThrow(
+				HTTP_MESSAGES.CURRENT_PASSWORD_INCORRECT,
 			);
 		});
 
-		it('should throw error if user not found', async () => {
-			mockUserService.getUserByIdRaw.mockResolvedValue(null as any);
-
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(
-				new Error(HTTP_MESSAGES.USER_NOT_FOUND),
-			);
-
-			await expect(authService.confirmPasswordCode(userId, code)).rejects.toThrow(
-				HTTP_MESSAGES.USER_NOT_FOUND,
-			);
-		});
 		it('should throw error if authRow is not found', async () => {
 			mockUserService.getUserByIdRaw.mockResolvedValue(mockUser);
 			mockAuthRepository.findByUserId.mockResolvedValue(null);
 
-			(ErrorFactory.unauthorized as jest.Mock).mockReturnValue(
+			(unauthorizedCreator.create as jest.Mock).mockReturnValue(
 				new Error(HTTP_MESSAGES.INVALID_CREDENTIALS),
 			);
 
-			await expect(authService.confirmPasswordCode(userId, code)).rejects.toThrow(
+			await expect(authService.changePassword(userId, changeData)).rejects.toThrow(
 				HTTP_MESSAGES.INVALID_CREDENTIALS,
 			);
 		});

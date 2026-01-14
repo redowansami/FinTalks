@@ -1,5 +1,5 @@
 import { UserRepository } from '../repositories/userRepository';
-import { ErrorFactory } from '../errors/errorFactory';
+import { notFoundCreator, conflictCreator } from '../errors/errorFactory';
 import {
 	CreateUserDTO,
 	UserResponseDTO,
@@ -22,12 +22,12 @@ export class UserService {
 	createUser = async (data: CreateUserDTO): Promise<UserResponseDTO> => {
 		const isUsernameFound = await this.userRepository.findByUsername(data.username);
 		if (isUsernameFound) {
-			throw ErrorFactory.conflict(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS);
+			throw conflictCreator.create(HTTP_MESSAGES.USERNAME_ALREADY_EXISTS);
 		}
 
 		const isEmailFound = await this.userRepository.findByEmail(data.email);
 		if (isEmailFound) {
-			throw ErrorFactory.conflict(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
+			throw conflictCreator.create(HTTP_MESSAGES.EMAIL_ALREADY_EXISTS);
 		}
 
 		const user = await this.userRepository.create(data);
@@ -47,7 +47,7 @@ export class UserService {
 	getUserById = async (id: string): Promise<UserResponseDTO> => {
 		const user: UserResponseDTO | null = await this.userRepository.findById(id);
 		if (!user) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 		return transformToDTO(UserResponseDTO, user);
 	};
@@ -55,7 +55,7 @@ export class UserService {
 	getUserByEmail = async (email: string): Promise<UserResponseDTO | null> => {
 		const user = await this.userRepository.findByEmail(email);
 		if (!user) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 		return transformToDTO(UserResponseDTO, user);
 	};
@@ -63,7 +63,7 @@ export class UserService {
 	getUserByIdRaw = async (id: string): Promise<SignupResponseDTO> => {
 		const user = await this.userRepository.findById(id);
 		if (!user) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 		return transformToDTO(SignupResponseDTO, user);
 	};
@@ -71,7 +71,7 @@ export class UserService {
 	getUserByEmailRaw = async (email: string): Promise<SignupResponseDTO> => {
 		const user = await this.userRepository.findByEmail(email);
 		if (!user) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 		return transformToDTO(SignupResponseDTO, user);
 	};
@@ -94,7 +94,7 @@ export class UserService {
 	getProfile = async (userId: string): Promise<GetProfileDTO> => {
 		const user = await this.userRepository.findById(userId);
 		if (!user) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 		return transformToDTO(GetProfileDTO, user);
 	};
@@ -102,7 +102,7 @@ export class UserService {
 	updateProfile = async (userId: string, data: UpdateProfileDTO): Promise<GetProfileDTO> => {
 		const user = await this.userRepository.findById(userId);
 		if (!user) {
-			throw ErrorFactory.notFound(HTTP_MESSAGES.USER_NOT_FOUND);
+			throw notFoundCreator.create(HTTP_MESSAGES.USER_NOT_FOUND);
 		}
 
 		const updatedUser = await this.userRepository.update(userId, data);

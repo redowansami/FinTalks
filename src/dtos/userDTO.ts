@@ -17,6 +17,8 @@ export class UserResponseDTO {
 	@Expose() username: string;
 	@Expose() name: string;
 	@Expose() email: string;
+	@Expose() bio: string | null;
+	@Expose() profilePictureUrl: string | null;
 	@Expose() joinDate: Date;
 	@Expose() role: string;
 }

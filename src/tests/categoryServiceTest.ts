@@ -1,14 +1,17 @@
 import { CategoryService } from '../services/categoryService';
 import { CategoryRepository } from '../repositories/categoryRepository';
 import { CreateCategoryDTO, UpdateCategoryDTO, CategoryResponseDTO } from '../dtos/categoryDTO';
-import { ErrorFactory } from '../errors/errorFactory';
+import { notFoundCreator, conflictCreator } from '../errors/errorFactory';
 import { transformToDTO } from '../utils/mapper';
 import { HTTP_MESSAGES } from '../constants/httpConstants';
 import { ConflictError, NotFoundError } from 'errors/customErrors';
 
 jest.mock('../repositories/categoryRepository');
 jest.mock('../utils/mapper');
-jest.mock('../errors/errorFactory');
+jest.mock('../errors/errorFactory', () => ({
+	notFoundCreator: { create: jest.fn() },
+	conflictCreator: { create: jest.fn() },
+}));
 
 describe('CategoryService', () => {
 	let categoryService: CategoryService;
@@ -70,7 +73,7 @@ describe('CategoryService', () => {
 			mockCategoryRepository.findByName.mockResolvedValue(mockCategoryEntity);
 
 			const mockError = new Error(HTTP_MESSAGES.CATEGORY_EXISTS) as ConflictError;
-			(ErrorFactory.conflict as jest.Mock).mockReturnValue(mockError);
+			(conflictCreator.create as jest.Mock).mockReturnValue(mockError);
 
 			await expect(categoryService.createCategory(createCategoryData)).rejects.toThrow();
 
@@ -187,7 +190,7 @@ describe('CategoryService', () => {
 			mockCategoryRepository.findById.mockResolvedValue(null);
 
 			const mockError = new Error(HTTP_MESSAGES.CATEGORY_NOT_FOUND) as NotFoundError;
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(mockError);
+			(notFoundCreator.create as jest.Mock).mockReturnValue(mockError);
 
 			await expect(categoryService.getCategoryById(categoryId)).rejects.toThrow();
 
@@ -261,7 +264,7 @@ describe('CategoryService', () => {
 			mockCategoryRepository.findById.mockResolvedValue(null);
 
 			const mockError = new Error(HTTP_MESSAGES.CATEGORY_NOT_FOUND) as NotFoundError;
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(mockError);
+			(notFoundCreator.create as jest.Mock).mockReturnValue(mockError);
 
 			await expect(categoryService.updateCategory(categoryId, updateData)).rejects.toThrow();
 
@@ -281,7 +284,7 @@ describe('CategoryService', () => {
 			mockCategoryRepository.findByName.mockResolvedValue(existingCategory);
 
 			const mockError = new Error(HTTP_MESSAGES.CATEGORY_EXISTS) as ConflictError;
-			(ErrorFactory.conflict as jest.Mock).mockReturnValue(mockError);
+			(conflictCreator.create as jest.Mock).mockReturnValue(mockError);
 
 			await expect(categoryService.updateCategory(categoryId, updateData)).rejects.toThrow();
 
@@ -329,7 +332,7 @@ describe('CategoryService', () => {
 			mockCategoryRepository.findById.mockResolvedValue(null);
 
 			const mockError = new Error(HTTP_MESSAGES.CATEGORY_NOT_FOUND) as NotFoundError;
-			(ErrorFactory.notFound as jest.Mock).mockReturnValue(mockError);
+			(notFoundCreator.create as jest.Mock).mockReturnValue(mockError);
 
 			await expect(categoryService.deleteCategory(categoryId)).rejects.toThrow(
 				HTTP_MESSAGES.CATEGORY_NOT_FOUND,
