@@ -9,7 +9,7 @@ import { CreateStoryDTO, UpdateStoryDTO, StoryResponseDTO, StoryQueryDTO } from 
 import { transformToDTO } from '../utils/mapper';
 import { getPaginatedResults } from '../utils/cursorPaginationHelper';
 import summarizerService from '../services/summarizerService';
-import { User } from 'entities/userEntity';
+import { User } from '../entities/userEntity';
 
 jest.mock('../repositories/storyRepository');
 jest.mock('../services/categoryService');
@@ -43,6 +43,7 @@ describe('StoryService', () => {
 	const mockStory: Story = {
 		storyId: 'story-123',
 		userId: 'user-123',
+		username: 'testuser',
 		title: 'Market Analysis 2024',
 		body: 'Detailed market analysis content',
 		createdAt: new Date('2024-01-01'),
@@ -52,6 +53,7 @@ describe('StoryService', () => {
 		reliabilityScore: 82,
 		predictionComparison: 'Market predictions were 90% accurate',
 		summaryUpdatedAt: new Date('2024-01-01'),
+		imageUrl: null,
 		userByUserId: {} as User,
 		categories: [mockCategory],
 	};
@@ -108,7 +110,8 @@ describe('StoryService', () => {
 
 	describe('createStory', () => {
 		it('should successfully create a story with categories and summary', async () => {
-			const createStoryData: CreateStoryDTO = {
+			const createStoryData: CreateStoryDTO & { userId: string } = {
+				userId: 'user-123',
 				title: 'Market Analysis 2024',
 				body: 'Detailed market analysis content',
 				categoryIds: ['cat-123'],
@@ -156,7 +159,8 @@ describe('StoryService', () => {
 		});
 
 		it('should create story without categories', async () => {
-			const createStoryData: CreateStoryDTO = {
+			const createStoryData: CreateStoryDTO & { userId: string } = {
+				userId: 'user-123',
 				title: 'Market Analysis 2024',
 				body: 'Detailed market analysis content',
 			};
@@ -183,7 +187,8 @@ describe('StoryService', () => {
 		});
 
 		it('should throw ConflictError when invalid category ids are provided', async () => {
-			const createStoryData: CreateStoryDTO = {
+			const createStoryData: CreateStoryDTO & { userId: string } = {
+				userId: 'user-123',
 				title: 'New Story',
 				body: 'Story body',
 				categoryIds: ['cat-123', 'cat-invalid'],
@@ -214,7 +219,8 @@ describe('StoryService', () => {
 		});
 
 		it('should attach summary data correctly to story', async () => {
-			const createStoryData: CreateStoryDTO = {
+			const createStoryData: CreateStoryDTO & { userId: string } = {
+				userId: 'user-123',
 				title: 'Market Analysis 2024',
 				body: 'Detailed market analysis content',
 			};
@@ -251,7 +257,8 @@ describe('StoryService', () => {
 		});
 
 		it('should handle empty categoryIds array and return early from attachCategories', async () => {
-			const createStoryData: CreateStoryDTO = {
+			const createStoryData: CreateStoryDTO & { userId: string } = {
+				userId: 'user-123',
 				title: 'Market Analysis',
 				body: 'Analysis content',
 				categoryIds: [],
