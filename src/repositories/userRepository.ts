@@ -1,0 +1,65 @@
+import { Repository, EntityManager } from 'typeorm';
+import { AppDataSource } from '../config/dataSource';
+import { User } from '../entities/userEntity';
+import { CreateUserDTO, UserQueryDTO } from 'dtos/userDTO';
+import { buildOffsetPaginationQuery } from '../utils/offsetPaginationQuery';
+import { applyFuzzySearch } from '../utils/fuzzySearch';
+import { inject, injectable } from 'tsyringe';
+import { ENTITY_MANAGER } from '../constants/tokens';
+
+@injectable()
+export class UserRepository {
+	private repository: Repository<User>;
+
+	constructor(@inject(ENTITY_MANAGER) private manager?: EntityManager) {
+		this.repository = this.manager
+			? this.manager.getRepository(User)
+			: AppDataSource.getRepository(User);
+	}
+
+	create = async (data: CreateUserDTO): Promise<User> => {
+		const user = this.repository.create(data);
+		return this.repository.save(user);
+	};
+
+	findAll = async (queryParams: UserQueryDTO): Promise<User[]> => {
+		const { search, orderBy, page, limit } = queryParams;
+		const queryBuilder = this.repository.createQueryBuilder('user');
+
+		if (search && search.trim()) {
+			applyFuzzySearch(queryBuilder, {
+				'user.name': search,
+				'user.username': search,
+				'user.email': search,
+			});
+		}
+
+		const orderByField = orderBy ? `user.${orderBy}` : 'user.userId';
+		buildOffsetPaginationQuery(queryBuilder, page, limit, orderBy, orderByField);
+
+		return queryBuilder.getMany();
+	};
+
+	findById = async (id: string): Promise<User | null> => {
+		return this.repository.findOne({ where: { userId: id } });
+	};
+
+	findByUsername = async (username: string): Promise<User | null> => {
+		return this.repository.findOne({ where: { username } });
+	};
+
+	findByEmail = async (email: string): Promise<User | null> => {
+		return this.repository.findOne({ where: { email } });
+	};
+
+	update = async (id: string, user: Partial<User>): Promise<User | null | undefined> => {
+		const result = await this.repository.update(id, user);
+		if (result.affected === 1) return this.findById(id);
+		else return null;
+	};
+
+	softDelete = async (id: string): Promise<boolean> => {
+		const result = await this.repository.softDelete(id);
+		return result.affected === 1;
+	};
+}
