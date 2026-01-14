@@ -12,11 +12,11 @@ const PORT = env.PORT;
 const app = express();
 
 const corsOptions = {
-	origin: 'http://localhost:5173',
+	origin: env.CORS_ORIGIN,
 	credentials: true,
 	optionsSuccessStatus: 200,
 };
-
+app.set('trust proxy', 1);
 app.use(cors(corsOptions));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -29,7 +29,9 @@ registerDependencies()
 		const storyRoutes = require('./routes/storyRoutes').default;
 		const authRoutes = require('./routes/authRoutes').default;
 		const categoryRoutes = require('./routes/categoryRoutes').default;
-
+		app.get('/', (_req, res) => {
+			res.json({ message: 'Welcome to FinTalks API' });
+		});
 		app.use(`/api/v1/users`, userRoutes);
 		app.use(`/api/v1/stories`, storyRoutes);
 		app.use('/api/v1/auth', authRoutes);
